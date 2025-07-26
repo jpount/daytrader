@@ -11,6 +11,8 @@ dev-debug.log
 .vscode
 .idea/
 .vscode/
+.claude/
+.taskmaster/
 *.suo
 *.ntvs*
 *.njsproj
