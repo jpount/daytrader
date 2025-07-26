@@ -26,3 +26,50 @@ You can either:
 OR
 * Run the scripts to create the docs
 
+### Using the scripts
+
+  1. Initial Setup (Run Once)
+
+  cd /Users/jp/work/ai-messin/daytrader
+
+  # First, create the database initialization scripts
+  ./scripts/create-db-scripts.sh
+
+  # Then run the main setup
+  ./scripts/setup-docs.sh
+
+  # Load the environment variables
+  source .env.documentation
+
+  2. Documentation Phases (Run Sequentially)
+
+  # Phase 1: Component Discovery (Days 1-2)
+  ./scripts/run-phase1.sh
+
+  # Phase 2: Business Logic Extraction (Days 3-5)
+  ./scripts/run-phase2.sh
+
+  # Phase 3: Diagram Generation (Days 6-7)
+  ./scripts/run-phase3.sh
+
+  3. Utility Scripts (Run As Needed)
+
+  # Check documentation progress
+  ./scripts/update-docs.sh status
+
+  # Create Claude tasks for specific analysis
+  ./scripts/claude-tasks.sh create "EJB Analysis" component-scan docs/ejb-analysis.md
+
+  # Mark components as documented
+  ./scripts/update-docs.sh mark-complete servlet TradeAppServlet
+
+  # Search documentation
+  ./scripts/update-docs.sh search "login flow"
+
+  4. Final Report (Run After Phases Complete)
+
+  # Generate comprehensive documentation report
+  ./scripts/generate-report.sh
+
+  Note: The phase scripts create task templates for Claude to execute. In practice, you would run Claude with these tasks between phases to actually
+  generate the documentation content.

@@ -102,14 +102,28 @@ if ! command -v sqlite3 &> /dev/null; then
     exit 1
 fi
 
-# Run database initialization script
-if [ -f "${SCRIPTS_DIR}/init-database.sql" ]; then
-    sqlite3 "${DB_DIR}/${DB_NAME}" < "${SCRIPTS_DIR}/init-database.sql"
-    print_success "Database initialized"
+# Check if database already exists
+if [ -f "${DB_DIR}/${DB_NAME}" ]; then
+    print_status "Database already exists. Checking integrity..."
+    # Check if database has tables
+    TABLE_COUNT=$(sqlite3 "${DB_DIR}/${DB_NAME}" "SELECT COUNT(*) FROM sqlite_master WHERE type='table';" 2>/dev/null || echo "0")
+    
+    if [ "$TABLE_COUNT" -gt 0 ]; then
+        print_success "Database is already initialized with $TABLE_COUNT tables"
+    else
+        print_status "Database exists but is empty. Initializing..."
+        if [ ! -f "${SCRIPTS_DIR}/init-database.sql" ]; then
+            "${SCRIPTS_DIR}/create-db-scripts.sh"
+        fi
+        sqlite3 "${DB_DIR}/${DB_NAME}" < "${SCRIPTS_DIR}/init-database.sql"
+        print_success "Database initialized"
+    fi
 else
-    print_error "Database initialization script not found. Creating it..."
-    # Create the init script if it doesn't exist
-    "${SCRIPTS_DIR}/create-db-scripts.sh"
+    print_status "Creating new database..."
+    # Create database initialization script if it doesn't exist
+    if [ ! -f "${SCRIPTS_DIR}/init-database.sql" ]; then
+        "${SCRIPTS_DIR}/create-db-scripts.sh"
+    fi
     sqlite3 "${DB_DIR}/${DB_NAME}" < "${SCRIPTS_DIR}/init-database.sql"
     print_success "Database created and initialized"
 fi

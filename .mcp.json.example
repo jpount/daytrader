@@ -36,8 +36,8 @@
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-sqlite",
-        "/Users/xxx/daytrader/daytrader-docs.db"
+        "mcp-sqlite",
+        "/Users/xxx/daytrader/.doc-db/daytrader_docs.db"
       ]
     }        
   }
