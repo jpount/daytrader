@@ -1,0 +1,15 @@
+I would like to create concise functional requirements for the following project:
+
+I want to create a set of detailed documentation and diagrams for an application
+The application to be documented is called DayTrader3 and is Trading application 
+The application code is in the app diurectory ./app
+
+My Requirements:
+- In the role of an architect provide an extremely detailed view of the application architecture and document it using mermaid.js diagrams
+- In the role of a technical writer, go through each Java class and JSP and provide an overview of the class including core business logic
+- In the role of a security expert, provide an extremely detailed security assessment
+- In the role of a performance engineer, provide an extremely detailed performance assessment
+- Create all documents in the ./docs directory
+- Create all diagrams in the ./docs/diagrams directory
+
+Output as markdown code.

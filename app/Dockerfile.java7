@@ -1,0 +1,20 @@
+FROM openjdk:8-jdk-alpine
+
+# Install Java 7 - using OpenJDK 8 as base but we'll configure for Java 7 compatibility
+RUN apk add --no-cache wget
+
+# Download and install Maven
+RUN wget -q https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz && \
+    tar -xzf apache-maven-3.6.3-bin.tar.gz && \
+    mv apache-maven-3.6.3 /usr/local/maven && \
+    ln -s /usr/local/maven/bin/mvn /usr/bin/mvn && \
+    rm apache-maven-3.6.3-bin.tar.gz
+
+# Set environment variables
+ENV MAVEN_HOME=/usr/local/maven
+ENV PATH=${MAVEN_HOME}/bin:${PATH}
+
+WORKDIR /workspace
+
+# Set Java compatibility for older projects
+ENV MAVEN_OPTS="-Xmx1024m"

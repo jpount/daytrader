@@ -1,0 +1,134 @@
+flowchart TB
+    %% Data Flow Through DayTrader3 Multi-Tier Architecture
+    
+    subgraph "Client Layer"
+        User[User Input]
+        Browser[Web Browser]
+        API[REST Client]
+    end
+    
+    subgraph "Presentation Tier"
+        subgraph "Web Components"
+            JSP[JSP Pages<br/>- Form data<br/>- Display logic]
+            Servlet[Servlets<br/>- Request parsing<br/>- Response formatting]
+            JSF[JSF Beans<br/>- UI state<br/>- Data binding]
+        end
+        
+        subgraph "Data Transformation"
+            ReqData[Request Data<br/>- Parameters<br/>- Form values<br/>- Session data]
+            RespData[Response Data<br/>- HTML/JSON<br/>- Error messages<br/>- Redirects]
+        end
+    end
+    
+    subgraph "Business Tier"
+        subgraph "Service Layer"
+            TradeAction[TradeAction<br/>- Mode selection<br/>- Service routing]
+            SLSB[Session Beans<br/>- Business logic<br/>- Transaction mgmt]
+            Direct[Direct JDBC<br/>- SQL execution<br/>- Result mapping]
+        end
+        
+        subgraph "Data Processing"
+            Validation[Data Validation<br/>- Input checks<br/>- Business rules]
+            Transform[Data Transform<br/>- DTO mapping<br/>- Type conversion]
+            Cache[Data Caching<br/>- Query cache<br/>- Entity cache]
+        end
+    end
+    
+    subgraph "Integration Layer"
+        subgraph "Persistence"
+            JPA[JPA Layer<br/>- Entity mapping<br/>- Query generation]
+            JDBC[JDBC Layer<br/>- Direct SQL<br/>- Connection pool]
+        end
+        
+        subgraph "Messaging"
+            JMS[JMS Layer<br/>- Message creation<br/>- Queue/Topic ops]
+            MDB[Message Beans<br/>- Async processing<br/>- Event handling]
+        end
+    end
+    
+    subgraph "Data Tier"
+        subgraph "Database"
+            Tables[(Database Tables<br/>- AccountEJB<br/>- OrderEJB<br/>- QuoteEJB<br/>- HoldingEJB)]
+            Indexes[(Indexes<br/>- Primary keys<br/>- Foreign keys<br/>- Query indexes)]
+        end
+        
+        subgraph "Message Store"
+            Queue[(JMS Queue<br/>- Order messages<br/>- Persistence)]
+            Topic[(JMS Topic<br/>- Market updates<br/>- Broadcasts)]
+        end
+    end
+    
+    %% Request Flow (Blue)
+    User -.->|"User Action"| Browser
+    Browser ==>|"HTTP Request<br/>Parameters"| JSP
+    API ==>|"REST Request<br/>JSON/XML"| Servlet
+    
+    JSP ==>|"Form Data"| ReqData
+    Servlet ==>|"Parsed Params"| ReqData
+    JSF ==>|"Bound Values"| ReqData
+    
+    ReqData ==>|"Typed Data"| TradeAction
+    TradeAction ==>|"Service Call"| SLSB
+    TradeAction ==>|"Direct Call"| Direct
+    
+    SLSB ==>|"Validated Data"| Validation
+    Direct ==>|"SQL Params"| Validation
+    
+    Validation ==>|"Clean Data"| Transform
+    Transform ==>|"Entity Data"| JPA
+    Transform ==>|"SQL Data"| JDBC
+    
+    JPA ==>|"JPQL/SQL"| Tables
+    JDBC ==>|"Direct SQL"| Tables
+    
+    %% Async Flow (Green)
+    SLSB -.->|"Order Message"| JMS
+    JMS -.->|"Queue Write"| Queue
+    Queue -.->|"Message"| MDB
+    MDB -.->|"Process"| SLSB
+    MDB -.->|"Publish"| Topic
+    
+    %% Response Flow (Red)
+    Tables -->|"Result Set"| JPA
+    Tables -->|"Result Set"| JDBC
+    
+    JPA -->|"Entities"| Cache
+    JDBC -->|"Data Maps"| Transform
+    Cache -->|"Cached Data"| Transform
+    
+    Transform -->|"DTOs"| SLSB
+    Transform -->|"Value Objects"| Direct
+    
+    SLSB -->|"Business Objects"| TradeAction
+    Direct -->|"Data Objects"| TradeAction
+    
+    TradeAction -->|"Response Data"| RespData
+    RespData -->|"View Data"| JSP
+    RespData -->|"JSON/XML"| Servlet
+    RespData -->|"Bean Props"| JSF
+    
+    JSP -->|"HTML"| Browser
+    Servlet -->|"HTTP Response"| Browser
+    Servlet -->|"REST Response"| API
+    
+    Browser -.->|"Display"| User
+    
+    %% Data Flow Types
+    classDef request fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef response fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+    classDef async fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    classDef data fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef storage fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    
+    class User,Browser,API,JSP,Servlet,JSF,ReqData request
+    class RespData,Cache response
+    class JMS,Queue,MDB,Topic async
+    class TradeAction,SLSB,Direct,Validation,Transform,JPA,JDBC data
+    class Tables,Indexes storage
+    
+    %% Legend
+    subgraph "Legend"
+        L1[==> Synchronous Data Flow]
+        L2[--> Asynchronous Flow]
+        L3[-.-> User Interaction]
+    end

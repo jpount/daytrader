@@ -1,0 +1,132 @@
+graph TB
+    subgraph EJBLayer ["EJB Layer - Business Logic Components"]
+        subgraph ServiceInterfaces ["Service Interfaces"]
+            TS["TradeServices Interface<br/>- Market operations<br/>- Trading operations<br/>- Account management<br/>- Portfolio management"]
+            TSWS["TradeWSServices Interface<br/>- Web Services facade"]
+        end
+
+        subgraph SessionBeans ["Session Bean Implementations"]
+            TSLSB["TradeSLSBBean<br/>@Stateless<br/>@TransactionAttribute(REQUIRED)<br/>- Primary business logic<br/>- JPA EntityManager injection<br/>- JMS resource injection"]
+            DSLSB["DirectSLSBBean<br/>@Stateless<br/>- Direct database access<br/>- Bypasses JPA for performance"]
+        end
+
+        subgraph LocalInterfaces ["Local Business Interfaces"]
+            TSL["TradeSLSBLocal<br/>- Local EJB interface"]
+            DSL["DirectSLSBLocal<br/>- Local direct interface"]
+        end
+
+        subgraph MDBs ["Message-Driven Beans"]
+            DTB3["DTBroker3MDB<br/>@MessageDriven<br/>- Queue: TradeBrokerQueue<br/>- Processes trade orders<br/>- Async order completion"]
+            DTS3["DTStreamer3MDB<br/>@MessageDriven<br/>- Topic: TradeStreamerTopic<br/>- Real-time market updates<br/>- Broadcast price changes"]
+        end
+
+        subgraph Actions ["Action Classes & Facades"]
+            TA["TradeAction<br/>- Client facade<br/>- Runtime mode selection<br/>- Service locator pattern"]
+            TWSA["TradeWSAction<br/>- Web services action<br/>- SOAP/REST adapter"]
+        end
+
+        subgraph Entities ["JPA Entity Beans"]
+            ADB["AccountDataBean<br/>@Entity<br/>- User account data<br/>- Balance, login count"]
+            APDB["AccountProfileDataBean<br/>@Entity<br/>- User profile info<br/>- Personal details"]
+            HDB["HoldingDataBean<br/>@Entity<br/>- Stock holdings<br/>- Quantity, purchase data"]
+            ODB["OrderDataBean<br/>@Entity<br/>- Buy/sell orders<br/>- Order status, pricing"]
+            QDB["QuoteDataBean<br/>@Entity<br/>- Stock quotes<br/>- Current price, volume"]
+            MSDB["MarketSummaryDataBean<br/>- Market statistics<br/>- TSIA index, volume"]
+            RSDB["RunStatsDataBean<br/>- Benchmark stats<br/>- Performance metrics"]
+        end
+    end
+
+    subgraph JMSInfra ["JMS Infrastructure"]
+        TBQ["TradeBrokerQueue<br/>- Order processing queue"]
+        TST["TradeStreamerTopic<br/>- Market data topic"]
+        QCF["QueueConnectionFactory<br/>@Resource injection"]
+        TCF["TopicConnectionFactory<br/>@Resource injection"]
+    end
+
+    subgraph PersistenceLayer ["Persistence Context"]
+        EM["EntityManager<br/>@PersistenceContext<br/>- JPA operations<br/>- Transaction management"]
+        PU["Persistence Unit<br/>- Derby database<br/>- JTA transactions"]
+    end
+
+    subgraph Utilities ["Utility Classes"]
+        FU["FinancialUtils<br/>- Price calculations<br/>- Market operations"]
+        L["Log<br/>- Application logging<br/>- Debug tracing"]
+        MDBS["MDBStats<br/>- MDB performance stats"]
+        TS2["TimerStat<br/>- Timing metrics"]
+        KB["KeyBlock<br/>- Key generation<br/>- ID management"]
+    end
+
+    %% Interface implementations
+    TS -.-> TSLSB
+    TS -.-> DSLSB
+    TSWS -.-> TWSA
+    TSL --> TSLSB
+    DSL --> DSLSB
+
+    %% Action class dependencies
+    TA --> TSL
+    TA --> DSL
+    TA --> TS
+    TWSA --> TA
+
+    %% MDB dependencies
+    DTB3 --> TSL
+    DTB3 --> TBQ
+    DTS3 --> TST
+    DTB3 --> MDBS
+    DTB3 --> TS2
+
+    %% Session bean resource injections
+    TSLSB --> EM
+    TSLSB --> QCF
+    TSLSB --> TCF
+    TSLSB --> TBQ
+    TSLSB --> TST
+
+    %% Entity relationships
+    TSLSB --> ADB
+    TSLSB --> APDB
+    TSLSB --> HDB
+    TSLSB --> ODB
+    TSLSB --> QDB
+    TSLSB --> MSDB
+    TSLSB --> RSDB
+
+    %% Persistence layer
+    EM --> PU
+    EM --> ADB
+    EM --> APDB
+    EM --> HDB
+    EM --> ODB
+    EM --> QDB
+
+    %% Utility dependencies
+    TSLSB --> FU
+    TSLSB --> L
+    TA --> FU
+    TA --> L
+    DTB3 --> L
+    DTS3 --> L
+    DSLSB --> KB
+
+    %% JMS flow
+    QCF --> TBQ
+    TCF --> TST
+
+    classDef interface fill:#E1F5FE,stroke:#0277BD,stroke-width:2px
+    classDef sessionBean fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+    classDef mdb fill:#FFF3E0,stroke:#F57C00,stroke-width:2px
+    classDef entity fill:#E8F5E8,stroke:#388E3C,stroke-width:2px
+    classDef action fill:#FFF8E1,stroke:#FBC02D,stroke-width:2px
+    classDef utility fill:#F5F5F5,stroke:#616161,stroke-width:2px
+    classDef jms fill:#FFE0B2,stroke:#FF9800,stroke-width:2px
+    classDef persistence fill:#E0F2F1,stroke:#00796B,stroke-width:2px
+
+    class TS,TSWS,TSL,DSL interface
+    class TSLSB,DSLSB sessionBean
+    class DTB3,DTS3 mdb
+    class ADB,APDB,HDB,ODB,QDB,MSDB,RSDB entity
+    class TA,TWSA action
+    class FU,L,MDBS,TS2,KB utility
+    class TBQ,TST,QCF,TCF jms
+    class EM,PU persistence

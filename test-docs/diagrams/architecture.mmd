@@ -1,0 +1,16 @@
+graph TB
+    subgraph "Frontend"
+        UI[User Interface]
+        Router[Router]
+    end
+    
+    subgraph "Backend"
+        API[API Gateway]
+        Auth[Authentication]
+        DB[(Database)]
+    end
+    
+    UI --> Router
+    Router --> API
+    API --> Auth
+    API --> DB

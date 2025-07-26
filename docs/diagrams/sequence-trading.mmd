@@ -1,0 +1,149 @@
+sequenceDiagram
+    title Stock Trading Transaction Flow (Buy/Sell Orders)
+    
+    participant User
+    participant Browser
+    participant Servlet as TradeAppServlet
+    participant Action as TradeServletAction
+    participant Trade as TradeAction
+    participant SLSB as TradeSLSBBean
+    participant DB as Database
+    participant Queue as JMS Queue
+    participant MDB as DTBroker3MDB
+    participant Topic as JMS Topic
+    participant Streamer as DTStreamer3MDB
+    
+    %% Buy Order Flow
+    rect rgb(240, 248, 255)
+        Note over User,Streamer: Buy Order Process
+        
+        User->>Browser: Enter buy order<br/>(symbol, quantity)
+        Browser->>Servlet: POST /daytrader/app<br/>action=buy<br/>symbol=IBM<br/>quantity=100
+        
+        Servlet->>Servlet: Validate session
+        Servlet->>Action: doBuy(req, resp, uid)
+        Action->>Action: Extract parameters
+        Action->>Trade: buy(uid, symbol, quantity, orderProcessingMode)
+        
+        alt EJB3 Mode
+            Trade->>SLSB: buy(uid, symbol, quantity, orderProcessingMode)
+            
+            %% Validate quote exists
+            SLSB->>DB: Find QuoteDataBean<br/>by symbol
+            DB-->>SLSB: Quote data
+            
+            %% Get account
+            SLSB->>DB: Find AccountDataBean<br/>by userID
+            DB-->>SLSB: Account data
+            
+            %% Create order
+            SLSB->>SLSB: Create OrderDataBean<br/>type="buy"<br/>status="open"
+            SLSB->>DB: Persist order
+            DB-->>SLSB: Order persisted
+            
+            alt Synchronous Processing
+                SLSB->>SLSB: completeOrder()<br/>immediately
+                SLSB->>SLSB: Create HoldingDataBean
+                SLSB->>DB: Persist holding
+                SLSB->>SLSB: Update account balance
+                SLSB->>DB: Update account
+                SLSB->>SLSB: Update order status<br/>to "completed"
+                SLSB->>DB: Update order
+                SLSB-->>Trade: Return completed order
+            else Asynchronous Processing
+                SLSB->>Queue: Send OrderMessage<br/>to TradeBrokerQueue
+                Queue-->>MDB: Deliver message
+                
+                Note over MDB: Async processing
+                MDB->>MDB: Extract order ID
+                MDB->>SLSB: completeOrder(orderID)
+                MDB->>Topic: Publish completion<br/>to TradeStreamerTopic
+                Topic-->>Streamer: Market update
+                
+                SLSB-->>Trade: Return open order
+            end
+            
+            Trade-->>Action: Return OrderDataBean
+        else Direct Mode
+            Trade->>Trade: Direct JDBC processing
+        end
+        
+        Action->>Action: Format response
+        Action-->>Servlet: Order confirmation
+        Servlet-->>Browser: Display order details
+        Browser-->>User: "Order placed successfully"
+    end
+    
+    %% Sell Order Flow
+    rect rgb(255, 240, 245)
+        Note over User,Streamer: Sell Order Process
+        
+        User->>Browser: Select holding to sell
+        Browser->>Servlet: POST /daytrader/app<br/>action=sell<br/>holdingID=12345
+        
+        Servlet->>Servlet: Validate session
+        Servlet->>Action: doSell(req, resp, uid)
+        Action->>Trade: sell(uid, holdingID, orderProcessingMode)
+        
+        Trade->>SLSB: sell(uid, holdingID, orderProcessingMode)
+        
+        %% Validate holding
+        SLSB->>DB: Find HoldingDataBean<br/>by holdingID
+        DB-->>SLSB: Holding data
+        
+        %% Verify ownership
+        SLSB->>SLSB: Verify holding.account<br/>matches userID
+        
+        alt Invalid ownership
+            SLSB-->>Trade: throw EJBException<br/>"Not authorized"
+            Trade-->>Action: Error
+            Action-->>Browser: "Authorization error"
+        else Valid ownership
+            %% Get quote for current price
+            SLSB->>DB: Find QuoteDataBean<br/>by holding.symbol
+            DB-->>SLSB: Current quote
+            
+            %% Create sell order
+            SLSB->>SLSB: Create OrderDataBean<br/>type="sell"<br/>holdingID=12345
+            SLSB->>DB: Persist order
+            
+            alt Synchronous Processing
+                SLSB->>SLSB: completeOrder()
+                SLSB->>DB: Delete holding
+                SLSB->>SLSB: Calculate proceeds
+                SLSB->>SLSB: Update account balance
+                SLSB->>DB: Update account
+                SLSB->>SLSB: Update order status
+                SLSB->>DB: Update order
+                SLSB-->>Trade: Completed order
+            else Asynchronous Processing
+                SLSB->>Queue: Send to broker queue
+                Queue-->>MDB: Process async
+                SLSB-->>Trade: Open order
+            end
+            
+            Trade-->>Action: Return order
+            Action-->>Browser: Order confirmation
+            Browser-->>User: "Sell order executed"
+        end
+    end
+    
+    %% Order Status Check
+    rect rgb(245, 245, 220)
+        Note over User,DB: Order Status Query
+        
+        User->>Browser: View orders
+        Browser->>Servlet: GET /daytrader/app<br/>action=orders
+        Servlet->>Action: doOrders(req, resp, uid)
+        Action->>Trade: getOrders(uid)
+        Trade->>SLSB: getOrders(uid)
+        
+        SLSB->>DB: Query OrderEJB<br/>WHERE account_id = uid<br/>ORDER BY orderID DESC
+        DB-->>SLSB: List of orders
+        
+        SLSB->>SLSB: Check each order status
+        SLSB-->>Trade: Order collection
+        Trade-->>Action: Orders
+        Action-->>Browser: Display order list
+        Browser-->>User: Show order history
+    end

@@ -1,0 +1,15 @@
+services:
+  web:
+    image: ibmcom/websphere-liberty:25.0.0.3-full-java8-openj9-ubi
+    ports:
+      - "9083:9083"
+      - "9443:9443"
+    volumes:
+      - ./daytrader3-ee6-wlpcfg:/opt/ibm/wlp/usr
+    environment:
+      - LICENSE=accept
+    command: ["/opt/ibm/wlp/bin/server", "run", "daytrader3_Sample"]
+    networks:
+      - webnet
+networks:
+  webnet:

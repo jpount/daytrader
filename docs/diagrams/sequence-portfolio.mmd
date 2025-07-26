@@ -1,0 +1,172 @@
+sequenceDiagram
+    title Portfolio and Account Management Flows
+    
+    participant User
+    participant Browser
+    participant Servlet as TradeAppServlet
+    participant Action as TradeServletAction
+    participant Trade as TradeAction
+    participant SLSB as TradeSLSBBean
+    participant DB as Database
+    
+    %% View Portfolio Flow
+    rect rgb(240, 255, 240)
+        Note over User,DB: View Portfolio
+        
+        User->>Browser: Click "Portfolio"
+        Browser->>Servlet: GET /daytrader/app<br/>action=portfolio
+        
+        Servlet->>Servlet: Validate session
+        Servlet->>Action: doPortfolio(req, resp, uid)
+        
+        Action->>Trade: getHoldings(uid)
+        Trade->>SLSB: getHoldings(uid)
+        
+        %% Get account first
+        SLSB->>DB: Find AccountDataBean<br/>by userID
+        DB-->>SLSB: Account
+        
+        %% Get all holdings for account
+        SLSB->>DB: Query HoldingEJB<br/>WHERE account_accountid = ?<br/>ORDER BY holdingid DESC
+        DB-->>SLSB: List<HoldingDataBean>
+        
+        %% For each holding, get current quote
+        loop For each holding
+            SLSB->>DB: Find QuoteDataBean<br/>by symbol
+            DB-->>SLSB: Current quote
+            SLSB->>SLSB: Calculate current value<br/>quantity * quote.price
+        end
+        
+        SLSB-->>Trade: Holdings collection
+        Trade-->>Action: Holdings
+        
+        %% Also get account summary
+        Action->>Trade: getAccountData(uid)
+        Trade->>SLSB: getAccountData(uid)
+        SLSB->>DB: Find account with profile
+        DB-->>SLSB: Account with profile
+        SLSB-->>Trade: AccountDataBean
+        Trade-->>Action: Account data
+        
+        Action->>Action: Calculate totals<br/>- Total holdings value<br/>- Account balance<br/>- Total assets
+        Action-->>Servlet: Portfolio data
+        Servlet-->>Browser: Display portfolio.jsp
+        Browser-->>User: Show holdings & balance
+    end
+    
+    %% View Account Profile
+    rect rgb(240, 240, 255)
+        Note over User,DB: View/Update Account Profile
+        
+        User->>Browser: Click "Account"
+        Browser->>Servlet: GET /daytrader/app<br/>action=account
+        
+        Servlet->>Action: doAccount(req, resp, uid)
+        
+        Action->>Trade: getAccountData(uid)
+        Trade->>SLSB: getAccountData(uid)
+        
+        SLSB->>DB: Find AccountDataBean<br/>with JOIN on AccountProfileDataBean
+        DB-->>SLSB: Account + Profile
+        
+        SLSB-->>Trade: Complete account data
+        Trade-->>Action: AccountDataBean
+        
+        Action-->>Servlet: Account info
+        Servlet-->>Browser: Display account.jsp
+        Browser-->>User: Show account details
+        
+        %% Update Profile
+        User->>Browser: Edit profile info
+        Browser->>Servlet: POST /daytrader/app<br/>action=update_profile<br/>fullname=...<br/>address=...<br/>email=...
+        
+        Servlet->>Action: doAccountUpdate(req, resp, uid)
+        Action->>Trade: updateAccountProfile(profile)
+        Trade->>SLSB: updateAccountProfile(profile)
+        
+        SLSB->>DB: Find AccountProfileDataBean
+        DB-->>SLSB: Profile
+        
+        SLSB->>SLSB: Update fields<br/>- fullname<br/>- address<br/>- email<br/>- creditcard
+        SLSB->>DB: Merge profile
+        DB-->>SLSB: Updated
+        
+        SLSB-->>Trade: Updated profile
+        Trade-->>Action: Success
+        Action-->>Browser: "Profile updated"
+        Browser-->>User: Show success message
+    end
+    
+    %% View Orders History
+    rect rgb(255, 240, 240)
+        Note over User,DB: View Order History
+        
+        User->>Browser: Click "Orders"
+        Browser->>Servlet: GET /daytrader/app<br/>action=orders
+        
+        Servlet->>Action: doOrders(req, resp, uid)
+        
+        alt View all orders
+            Action->>Trade: getOrders(uid)
+            Trade->>SLSB: getOrders(uid)
+            
+            SLSB->>DB: Query OrderEJB<br/>WHERE account_accountid = ?<br/>ORDER BY orderid DESC
+            DB-->>SLSB: List<OrderDataBean>
+            
+        else View closed orders only
+            Action->>Trade: getClosedOrders(uid)
+            Trade->>SLSB: getClosedOrders(uid)
+            
+            SLSB->>DB: Query OrderEJB<br/>WHERE account_accountid = ?<br/>AND orderstatus = 'closed'<br/>ORDER BY orderid DESC
+            DB-->>SLSB: List<OrderDataBean>
+        end
+        
+        %% Get quote for each order
+        loop For each order
+            SLSB->>DB: Find QuoteDataBean<br/>by order.symbol
+            DB-->>SLSB: Quote data
+        end
+        
+        SLSB-->>Trade: Orders with quotes
+        Trade-->>Action: Order collection
+        
+        Action->>Action: Calculate statistics<br/>- Total orders<br/>- Open/Closed counts<br/>- Total value
+        Action-->>Servlet: Orders data
+        Servlet-->>Browser: Display orders.jsp
+        Browser-->>User: Show order history
+    end
+    
+    %% View Market Summary
+    rect rgb(255, 255, 240)
+        Note over User,DB: View Market Summary
+        
+        User->>Browser: Click "Market Summary"
+        Browser->>Servlet: GET /daytrader/app<br/>action=marketSummary
+        
+        Servlet->>Action: doMarketSummary(req, resp, uid)
+        
+        Action->>Trade: getMarketSummary()
+        Trade->>SLSB: getMarketSummary()
+        
+        par Get top gainers
+            SLSB->>DB: Query QuoteEJB<br/>ORDER BY change1 DESC<br/>LIMIT 5
+            DB-->>SLSB: Top gainers
+        and Get top losers
+            SLSB->>DB: Query QuoteEJB<br/>ORDER BY change1 ASC<br/>LIMIT 5
+            DB-->>SLSB: Top losers
+        and Get TSIA summary
+            SLSB->>DB: Calculate TSIA index
+            DB-->>SLSB: Market index
+        and Get trading volume
+            SLSB->>DB: Sum volume from QuoteEJB
+            DB-->>SLSB: Total volume
+        end
+        
+        SLSB->>SLSB: Create MarketSummaryDataBean
+        SLSB-->>Trade: Market summary
+        Trade-->>Action: MarketSummaryDataBean
+        
+        Action-->>Servlet: Market data
+        Servlet-->>Browser: Display marketSummary.jsp
+        Browser-->>User: Show market overview
+    end

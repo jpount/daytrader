@@ -1,0 +1,164 @@
+graph TB
+    subgraph "Dependency Injection and Service Layer Architecture"
+        
+        subgraph "Service Layer Abstractions"
+            subgraph "Business Service Interfaces"
+                TSI[TradeServices Interface<br/>- Core business operations<br/>- Implementation-agnostic<br/>- Contract definition]
+                TWSI[TradeWSServices Interface<br/>- Web services facade<br/>- SOAP/REST abstraction<br/>- External integration]
+            end
+
+            subgraph "Local Business Interfaces"
+                TSLSBL[TradeSLSBLocal<br/>- EJB local interface<br/>- Container-managed<br/>- Transaction context]
+                DSLSBL[DirectSLSBLocal<br/>- Direct access interface<br/>- Performance optimization<br/>- Bypass container services]
+            end
+
+            subgraph "Service Implementation Strategy"
+                SC[Service Configurator<br/>TradeConfig.runTimeMode<br/>- EJB3: Container-managed<br/>- SESSION3: Direct session<br/>- DIRECT: JDBC direct]
+            end
+        end
+
+        subgraph "Dependency Injection Patterns"
+            subgraph "EJB Injection (@EJB)"
+                EJB1[Web Tier → EJB Tier<br/>@EJB TradeSLSBLocal<br/>@EJB DirectSLSBLocal<br/>JSF Beans, Test Servlets]
+                EJB2[MDB → Session Bean<br/>@EJB TradeSLSBLocal<br/>DTBroker3MDB injection<br/>Message processing]
+            end
+
+            subgraph "Resource Injection (@Resource)"
+                RES1[JMS Resource Injection<br/>@Resource QueueConnectionFactory<br/>@Resource TopicConnectionFactory<br/>@Resource Queue/Topic destinations]
+                RES2[Context Injection<br/>@Resource SessionContext<br/>@Resource MessageDrivenContext<br/>Container services access]
+                RES3[Data Source Injection<br/>@Resource DataSource<br/>JDBC connections<br/>Performance primitives]
+            end
+
+            subgraph "Persistence Context Injection"
+                PC1[EntityManager Injection<br/>@PersistenceContext EntityManager<br/>JPA operations<br/>Transaction-scoped context]
+            end
+        end
+
+        subgraph "Service Layer Implementation"
+            subgraph "Primary Service Bean"
+                TSLSBB["TradeSLSBBean<br/>@Stateless<br/>@TransactionAttribute - REQUIRED<br/>@TransactionManagement - CONTAINER<br/>Main business logic implementation"]
+            end
+
+            subgraph "Direct Access Bean"
+                DSLSBB["DirectSLSBBean<br/>@Stateless<br/>Direct JDBC access<br/>Performance optimization<br/>Minimal container overhead"]
+            end
+
+            subgraph "Service Locator Pattern"
+                SL["Service Locator<br/>TradeAction.createTrade<br/>- JNDI lookups<br/>- Runtime mode selection<br/>- Service caching"]
+            end
+
+            subgraph "Factory Pattern"
+                TA[TradeAction Factory<br/>- Service instantiation<br/>- Implementation hiding<br/>- Configuration-driven]
+            end
+        end
+
+        subgraph "Cross-Cutting Concerns"
+            subgraph "Transaction Management"
+                TM["Transaction Management<br/>- Container-managed - CMT<br/>- JTA coordination<br/>- Two-phase commit support"]
+                TA1[Transaction Attributes<br/>@TransactionAttribute - REQUIRED<br/>Declarative transaction boundaries<br/>Automatic rollback]
+            end
+
+            subgraph "Security Context"
+                SEC[Security Context<br/>- Principal propagation<br/>- Role-based access<br/>- Method-level security]
+            end
+
+            subgraph "Logging and Monitoring"
+                LOG[Logging Framework<br/>Log utility class<br/>- Debug tracing<br/>- Performance metrics]
+                MON[MDB Statistics<br/>MDBStats, TimerStat<br/>- Message processing metrics<br/>- Performance monitoring]
+            end
+
+            subgraph "Configuration Management"
+                CONFIG[Configuration Injection<br/>TradeConfig<br/>- Runtime mode selection<br/>- Feature toggles<br/>- Performance tuning]
+            end
+        end
+
+        subgraph "Container Services"
+            subgraph "EJB Container"
+                EJBC[EJB Container<br/>- Lifecycle management<br/>- Dependency injection<br/>- Transaction coordination<br/>- Security enforcement]
+            end
+
+            subgraph "Web Container"
+                WEBC[Web Container<br/>- Servlet lifecycle<br/>- JSF managed beans<br/>- Resource injection<br/>- Request/session scope]
+            end
+
+            subgraph "CDI Container"
+                CDI[CDI Context<br/>- Dependency injection<br/>- Scoped contexts<br/>- Event handling<br/>- Interceptor support]
+            end
+        end
+
+        subgraph "JNDI Namespace Structure"
+            subgraph "EJB References"
+                JNDI1[java:comp/env/web/ejb/local/<br/>- TradeSLSBBean<br/>- DirectSLSBBean<br/>Local business interfaces]
+            end
+
+            subgraph "JMS Resources"
+                JNDI2[jms/ namespace<br/>- jms/QueueConnectionFactory<br/>- jms/TopicConnectionFactory<br/>- jms/TradeBrokerQueue<br/>- jms/TradeStreamerTopic]
+            end
+
+            subgraph "JDBC Resources"
+                JNDI3[jdbc/ namespace<br/>- jdbc/TradeDataSource<br/>- jdbc/NoTxTradeDataSource<br/>JTA and non-JTA sources]
+            end
+        end
+    end
+
+    %% Service abstraction relationships
+    TSI -.-> TSLSBB
+    TSI -.-> DSLSBB
+    TWSI -.-> TA
+    TSLSBL --> TSLSBB
+    DSLSBL --> DSLSBB
+
+    %% Dependency injection relationships
+    EJB1 --> TSLSBL
+    EJB1 --> DSLSBL
+    EJB2 --> TSLSBL
+    
+    RES1 --> TSLSBB
+    RES2 --> TSLSBB
+    RES3 --> DSLSBB
+    
+    PC1 --> TSLSBB
+
+    %% Service layer relationships
+    SC --> TSLSBB
+    SC --> DSLSBB
+    SL --> SC
+    TA --> SL
+
+    %% Cross-cutting concerns
+    TM --> TSLSBB
+    TM --> DSLSBB
+    TA1 --> TSLSBB
+    
+    SEC --> EJBC
+    LOG --> TSLSBB
+    LOG --> DSLSBB
+    MON --> EJB2
+    CONFIG --> SC
+
+    %% Container relationships
+    EJBC --> TSLSBB
+    EJBC --> DSLSBB
+    WEBC --> EJB1
+    CDI --> EJBC
+
+    %% JNDI relationships
+    JNDI1 --> SL
+    JNDI2 --> RES1
+    JNDI3 --> RES3
+
+    classDef interface fill:#E1F5FE,stroke:#0277BD,stroke-width:2px
+    classDef implementation fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+    classDef injection fill:#E8F5E8,stroke:#388E3C,stroke-width:2px
+    classDef resource fill:#FFF3E0,stroke:#F57C00,stroke-width:2px
+    classDef container fill:#FFE0B2,stroke:#FF9800,stroke-width:2px
+    classDef crosscutting fill:#F5F5F5,stroke:#616161,stroke-width:2px
+    classDef jndi fill:#FFF8E1,stroke:#FBC02D,stroke-width:2px
+
+    class TSI,TWSI,TSLSBL,DSLSBL interface
+    class TSLSBB,DSLSBB,TA,SL implementation
+    class EJB1,EJB2,PC1 injection
+    class RES1,RES2,RES3 resource
+    class EJBC,WEBC,CDI container
+    class TM,TA1,SEC,LOG,MON,CONFIG crosscutting
+    class JNDI1,JNDI2,JNDI3 jndi

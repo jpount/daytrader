@@ -1,0 +1,176 @@
+graph TB
+    subgraph "Web Tier - Presentation Layer Components"
+        subgraph "Main Application Servlets"
+            TAS["TradeAppServlet<br/>@WebServlet(/app)<br/>- Main trading interface<br/>- Form processing<br/>- Request routing"]
+            TSS["TradeScenarioServlet<br/>- Benchmark scenarios<br/>- Automated trading<br/>- Load testing support"]
+            TCS["TradeConfigServlet<br/>- System configuration<br/>- Database operations<br/>- Runtime settings"]
+            TS["TestServlet<br/>- System testing<br/>- Connectivity checks"]
+            TBD["TradeBuildDB<br/>- Database initialization<br/>- Schema creation<br/>- Data population"]
+        end
+
+        subgraph "Servlet Action Layer"
+            TSA["TradeServletAction<br/>- Business logic adapter<br/>- Request/response handling<br/>- JSP forwarding<br/>- Session management"]
+        end
+
+        subgraph "Web Filters & Listeners"
+            OAF["OrdersAlertFilter<br/>- Order completion alerts<br/>- Filter chain processing"]
+            TWCL["TradeWebContextListener<br/>@WebListener<br/>- Application lifecycle<br/>- Context initialization"]
+        end
+
+        subgraph "JSF Managed Beans"
+            AB["AccountBean<br/>@ManagedBean<br/>- Account management<br/>- User profile handling"]
+            QB["QuoteBean<br/>@ManagedBean<br/>- Quote display<br/>- Market data binding"]
+        end
+
+        subgraph "JSP Pages - UI Views"
+            subgraph "Core Trading Pages"
+                THOME["tradehome.jsp<br/>- Main landing page<br/>- Navigation menu"]
+                ACCT["account.jsp<br/>- User account view<br/>- Profile display"]
+                PORT["portfolio.jsp<br/>- Holdings display<br/>- Portfolio summary"]
+                QUOTE["quote.jsp<br/>- Stock quote lookup<br/>- Market data display"]
+                ORDER["order.jsp<br/>- Buy/sell interface<br/>- Order placement"]
+                MARKET["marketSummary.jsp<br/>- Market overview<br/>- TSIA index display"]
+            end
+            
+            subgraph "User Management Pages"
+                REG["register.jsp<br/>- User registration<br/>- Account creation"]
+                WELCOME["welcome.jsp<br/>- Login page<br/>- Authentication"]
+            end
+            
+            subgraph "System Pages"
+                CONFIG["config.jsp<br/>- System configuration<br/>- Admin interface"]
+                STATS["runStats.jsp<br/>- Performance metrics<br/>- Benchmark results"]
+                ERROR["error.jsp<br/>- Error handling<br/>- Exception display"]
+            end
+            
+            subgraph "Image-Enabled Pages"
+                THOMEIMG["tradehomeImg.jsp<br/>- Graphics version"]
+                ACCTIMG["accountImg.jsp<br/>- Graphics version"]
+                PORTIMG["portfolioImg.jsp<br/>- Graphics version"]
+                QUOTEIMG["quoteImg.jsp<br/>- Graphics version"]
+                ORDERIMG["orderImg.jsp<br/>- Graphics version"]
+                REGIMG["registerImg.jsp<br/>- Graphics version"]
+                WELCOMEIMG["welcomeImg.jsp<br/>- Graphics version"]
+            end
+        end
+
+        subgraph "Performance Testing Primitives"
+            PS["PingServlet<br/>- Basic connectivity test"]
+            PS2DB["PingServlet2DB<br/>- Database connectivity"]
+            PS2JSP["PingServlet2Jsp<br/>- JSP processing test"]
+            PS2SERVLET["PingServlet2Servlet<br/>- Servlet chaining test"]
+            PS2PDF["PingServlet2PDF<br/>- PDF generation test"]
+            PSJDBC["PingJDBCRead/Write<br/>- Database operations"]
+            PSSession["PingSession1/2/3<br/>- Session management tests"]
+        end
+
+        subgraph "EJB Integration Primitives"
+            PS2Entity["PingServlet2Entity<br/>- Entity access test"]
+            PS2Session["PingServlet2Session<br/>- Session bean test"]
+            PS2MDB["PingServlet2MDBQueue/Topic<br/>- Message-driven bean tests"]
+            PS2CMR["PingServlet2Session2CMROne2*<br/>- Entity relationship tests"]
+            PS2JDBC2["PingServlet2Session2JDBC*<br/>- Mixed access patterns"]
+        end
+
+        subgraph "REST Services Module"
+            AA["AddressApplication<br/>@ApplicationPath(/api)<br/>- JAX-RS application config"]
+            AB2["AddressBook<br/>@Path(/addressbook)<br/>- REST endpoint<br/>- CRUD operations"]
+            ABD["AddressBookDatabase<br/>- REST data access<br/>- In-memory storage"]
+            ADDR["Address<br/>- REST data model<br/>- JAXB annotations"]
+            AL["AddressList<br/>- Collection wrapper<br/>- XML binding"]
+            OF["ObjectFactory<br/>- JAXB factory<br/>- XML serialization"]
+        end
+    end
+
+    subgraph "External Dependencies"
+        EJBLAYER["EJB Layer<br/>- Business services<br/>- TradeServices interface"]
+        HTTPSESSION["HTTP Session<br/>- User state<br/>- Authentication data"]
+        SERVLETCONTEXT["ServletContext<br/>- Application state<br/>- Configuration"]
+    end
+
+    %% Main servlet dependencies
+    TAS --> TSA
+    TSS --> TSA
+    TCS --> TSA
+    
+    %% Action layer dependencies
+    TSA --> EJBLAYER
+    TSA --> HTTPSESSION
+    TSA --> SERVLETCONTEXT
+    
+    %% JSF bean dependencies
+    AB --> EJBLAYER
+    QB --> EJBLAYER
+    
+    %% JSP relationships - Core pages
+    TAS --> THOME
+    TSA --> ACCT
+    TSA --> PORT
+    TSA --> QUOTE
+    TSA --> ORDER
+    TSA --> MARKET
+    TSA --> REG
+    TSA --> WELCOME
+    TSA --> CONFIG
+    TSA --> STATS
+    TSA --> ERROR
+    
+    %% Image versions
+    THOME --> THOMEIMG
+    ACCT --> ACCTIMG
+    PORT --> PORTIMG
+    QUOTE --> QUOTEIMG
+    ORDER --> ORDERIMG
+    REG --> REGIMG
+    WELCOME --> WELCOMEIMG
+    
+    %% Filter chain
+    OAF --> TAS
+    OAF --> TSS
+    
+    %% Context listener
+    TWCL --> SERVLETCONTEXT
+    
+    %% Performance primitive chains
+    PS --> PS2DB
+    PS --> PS2JSP
+    PS --> PS2SERVLET
+    PS --> PS2PDF
+    PS2SERVLET --> PS2DB
+    PS2JSP --> PSJDBC
+    
+    %% EJB integration chains
+    PS2Entity --> EJBLAYER
+    PS2Session --> EJBLAYER
+    PS2MDB --> EJBLAYER
+    PS2CMR --> EJBLAYER
+    PS2JDBC2 --> EJBLAYER
+    
+    %% REST service relationships
+    AA --> AB2
+    AB2 --> ABD
+    AB2 --> ADDR
+    AB2 --> AL
+    AL --> ADDR
+    OF --> ADDR
+    OF --> AL
+
+    classDef servlet fill:#FFE0B2,stroke:#FF9800,stroke-width:2px
+    classDef action fill:#FFF3E0,stroke:#F57C00,stroke-width:2px
+    classDef filter fill:#E8EAF6,stroke:#3F51B5,stroke-width:2px
+    classDef jsf fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+    classDef jsp fill:#E8F5E8,stroke:#388E3C,stroke-width:2px
+    classDef primitive fill:#F5F5F5,stroke:#616161,stroke-width:2px
+    classDef rest fill:#E0F2F1,stroke:#00796B,stroke-width:2px
+    classDef external fill:#FFF8E1,stroke:#FBC02D,stroke-width:2px
+    classDef image fill:#E1F5FE,stroke:#0277BD,stroke-width:2px
+
+    class TAS,TSS,TCS,TS,TBD servlet
+    class TSA action
+    class OAF,TWCL filter
+    class AB,QB jsf
+    class THOME,ACCT,PORT,QUOTE,ORDER,MARKET,REG,WELCOME,CONFIG,STATS,ERROR jsp
+    class THOMEIMG,ACCTIMG,PORTIMG,QUOTEIMG,ORDERIMG,REGIMG,WELCOMEIMG image
+    class PS,PS2DB,PS2JSP,PS2SERVLET,PS2PDF,PSJDBC,PSSession,PS2Entity,PS2Session,PS2MDB,PS2CMR,PS2JDBC2 primitive
+    class AA,AB2,ABD,ADDR,AL,OF rest
+    class EJBLAYER,HTTPSESSION,SERVLETCONTEXT external

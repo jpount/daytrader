@@ -1,0 +1,158 @@
+sequenceDiagram
+    title Asynchronous Message Processing Flow
+    
+    participant User
+    participant Servlet as TradeServlet
+    participant Trade as TradeAction
+    participant SLSB as TradeSLSBBean
+    participant JMS as JMS Provider
+    participant Queue as TradeBrokerQueue
+    participant Broker as DTBroker3MDB
+    participant Topic as TradeStreamerTopic
+    participant Streamer as DTStreamer3MDB
+    participant Client as Market Clients
+    
+    %% Asynchronous Order Processing
+    rect rgb(240, 255, 240)
+        Note over User,Client: Asynchronous Order Processing Mode
+        
+        User->>Servlet: Submit order<br/>(buy/sell)
+        Servlet->>Trade: buy()/sell()<br/>orderProcessingMode=ASYNC_2PHASE
+        
+        Trade->>SLSB: Create order
+        SLSB->>SLSB: Create OrderDataBean<br/>status="open"
+        SLSB->>SLSB: Persist order
+        
+        %% Queue the order for async processing
+        SLSB->>JMS: Create JMS Message<br/>with orderID
+        JMS->>Queue: Send to TradeBrokerQueue
+        Queue->>Queue: Persist message
+        
+        SLSB-->>Trade: Return open order
+        Trade-->>Servlet: Order created
+        Servlet-->>User: "Order submitted"<br/>(immediate response)
+        
+        Note over Queue,Broker: Asynchronous processing begins
+        
+        %% MDB Processing
+        Queue-->>Broker: onMessage()<br/>(Container managed)
+        activate Broker
+        
+        Broker->>Broker: Extract orderID<br/>from message
+        Broker->>Broker: Log message receipt
+        
+        alt Buy Order Processing
+            Broker->>SLSB: completeOrder(orderID)
+            activate SLSB
+            
+            SLSB->>SLSB: Find order by ID
+            SLSB->>SLSB: Get quote price
+            SLSB->>SLSB: Create holding
+            SLSB->>SLSB: Update account balance
+            SLSB->>SLSB: Update order status<br/>to "completed"
+            SLSB->>SLSB: Commit transaction
+            
+            SLSB-->>Broker: Order completed
+            deactivate SLSB
+            
+        else Sell Order Processing
+            Broker->>SLSB: completeOrder(orderID)
+            activate SLSB
+            
+            SLSB->>SLSB: Find order by ID
+            SLSB->>SLSB: Delete holding
+            SLSB->>SLSB: Update account balance
+            SLSB->>SLSB: Update order status
+            SLSB->>SLSB: Commit transaction
+            
+            SLSB-->>Broker: Order completed
+            deactivate SLSB
+        end
+        
+        %% Publish completion event
+        Broker->>JMS: Create completion message
+        JMS->>Topic: Publish to TradeStreamerTopic
+        Broker->>Broker: Update MDB stats
+        
+        deactivate Broker
+    end
+    
+    %% Market Data Streaming
+    rect rgb(240, 240, 255)
+        Note over Topic,Client: Market Data Streaming
+        
+        Topic-->>Streamer: onMessage()<br/>(Topic subscriber)
+        activate Streamer
+        
+        Streamer->>Streamer: Extract order details
+        Streamer->>Streamer: Format market update
+        
+        par Broadcast to subscribers
+            Streamer-->>Client: Market update 1
+        and
+            Streamer-->>Client: Market update 2
+        and
+            Streamer-->>Client: Market update N
+        end
+        
+        Streamer->>Streamer: Update statistics
+        deactivate Streamer
+    end
+    
+    %% Error Handling Flow
+    rect rgb(255, 240, 240)
+        Note over Queue,Broker: Error Handling and Recovery
+        
+        Queue-->>Broker: Poison message
+        activate Broker
+        
+        Broker->>SLSB: completeOrder(orderID)
+        SLSB--xBroker: Exception thrown
+        
+        Broker->>Broker: Log error
+        Broker->>Broker: Increment retry count
+        
+        alt Retry limit not reached
+            Broker->>Queue: Return message<br/>for redelivery
+            Queue->>Queue: Requeue with<br/>delay backoff
+        else Max retries exceeded
+            Broker->>Broker: Move to DLQ<br/>(Dead Letter Queue)
+            Broker->>Broker: Alert operations
+        end
+        
+        deactivate Broker
+    end
+    
+    %% Transaction Boundaries
+    rect rgb(255, 255, 240)
+        Note over SLSB,Broker: Transaction Management
+        
+        Note over SLSB: Container-Managed Transactions (CMT)
+        SLSB->>SLSB: @TransactionAttribute(REQUIRED)
+        
+        Note over Broker: Message-Driven Bean Transactions
+        Broker->>Broker: @TransactionAttribute(REQUIRED)
+        Broker->>Broker: XA Transaction includes:<br/>- JMS message consumption<br/>- Database operations<br/>- JMS message production
+        
+        alt Transaction Success
+            Broker->>Broker: All operations succeed
+            Broker->>JMS: Commit transaction
+            JMS->>Queue: Remove message
+            JMS->>Topic: Confirm publish
+        else Transaction Rollback
+            Broker->>Broker: Any operation fails
+            Broker->>JMS: Rollback transaction
+            JMS->>Queue: Return message
+            Note over Queue: Message available<br/>for redelivery
+        end
+    end
+    
+    %% Performance Monitoring
+    rect rgb(245, 245, 220)
+        Note over Broker,Streamer: Performance Statistics
+        
+        Broker->>Broker: MDBStats.increment()
+        Broker->>Broker: Record timing:<br/>- Message receipt time<br/>- Processing duration<br/>- Completion time
+        
+        Streamer->>Streamer: Track metrics:<br/>- Messages processed<br/>- Broadcast count<br/>- Average latency
+    end

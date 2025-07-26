@@ -1,0 +1,261 @@
+sequenceDiagram
+    participant User as User/Browser
+    participant JSP as JSP Pages
+    participant Servlet as TradeAppServlet
+    participant Action as TradeServletAction
+    participant Trade as TradeAction
+    participant SLSB as TradeSLSBBean
+    participant EM as EntityManager
+    participant DB as Derby Database
+
+    Note over User, DB: Portfolio and Account Management Sequence Flows
+    
+    %% Portfolio View Workflow
+    rect rgb(240, 248, 255)
+        Note over User, DB: 1. Portfolio Viewing Workflow
+        
+        User->>JSP: Navigate to /daytrader/app?action=portfolio
+        JSP->>Servlet: GET request with action=portfolio
+        Servlet->>Action: doPortfolio(ctx, req, resp, userID, "")
+        
+        %% Get holdings data
+        Action->>Trade: getHoldings(userID)
+        Trade->>SLSB: getHoldings(userID)
+        
+        SLSB->>EM: createNamedQuery("holdingejb.holdingsByUserID")
+        EM->>DB: SELECT h FROM holdingejb h WHERE h.account.profile.userID = ?
+        DB-->>EM: Holdings collection data
+        EM-->>SLSB: Collection<HoldingDataBean>
+        
+        %% Inflate lazy quote relationships
+        loop For each holding in collection
+            SLSB->>SLSB: holding.getQuote()
+            Note over SLSB: Lazy loading of Quote entity
+            SLSB->>EM: Load QuoteDataBean for holding
+            EM->>DB: SELECT FROM quoteejb WHERE symbol=?
+            DB-->>EM: Quote data
+            EM-->>SLSB: Quote entity attached to holding
+        end
+        
+        SLSB-->>Trade: Collection<HoldingDataBean> (with quotes)
+        Trade-->>Action: Holdings collection
+        
+        %% Get current quotes for all held stocks
+        Action->>Action: Create Collection<QuoteDataBean>
+        loop For each holding
+            Action->>Trade: getQuote(holding.getSymbol())
+            Trade->>SLSB: getQuote(symbol)
+            SLSB->>EM: find(QuoteDataBean.class, symbol)
+            EM->>DB: SELECT FROM quoteejb WHERE symbol=?
+            DB-->>EM: Current quote data
+            EM-->>SLSB: QuoteDataBean
+            SLSB-->>Trade: Current quote
+            Trade-->>Action: QuoteDataBean
+            Action->>Action: Add quote to collection
+        end
+        
+        %% Calculate portfolio summary
+        Action->>Action: Calculate total holdings value
+        Action->>Action: Calculate gains/losses per holding
+        Action->>Action: req.setAttribute("holdingDataBeans", holdings)
+        Action->>Action: req.setAttribute("quoteDataBeans", quotes)
+        Action->>Action: requestDispatch(portfolio.jsp)
+        
+        Action-->>Servlet: Forward to portfolio.jsp
+        Servlet->>JSP: Render portfolio page
+        JSP->>User: Display portfolio with holdings and current values
+    end
+    
+    %% Account Details Workflow  
+    rect rgb(248, 255, 248)
+        Note over User, DB: 2. Account Details Viewing Workflow
+        
+        User->>JSP: Navigate to /daytrader/app?action=account
+        JSP->>Servlet: GET request with action=account
+        Servlet->>Action: doAccount(ctx, req, resp, userID, "")
+        
+        %% Get account data
+        Action->>Trade: getAccountData(userID)
+        Trade->>SLSB: getAccountData(userID)
+        
+        SLSB->>EM: find(AccountProfileDataBean.class, userID)
+        EM->>DB: SELECT FROM accountprofileejb WHERE userid=?
+        DB-->>EM: AccountProfile data
+        EM-->>SLSB: AccountProfileDataBean
+        
+        %% Inflate account relationship
+        SLSB->>SLSB: profile.getAccount()
+        Note over SLSB: Lazy loading of Account relationship
+        SLSB->>EM: Load AccountDataBean
+        EM->>DB: SELECT FROM accountejb WHERE profile_userid=?
+        DB-->>EM: Account data
+        EM-->>SLSB: AccountDataBean (with balance, login counts)
+        
+        SLSB-->>Trade: AccountDataBean
+        Trade-->>Action: Account data
+        
+        %% Get profile data separately
+        Action->>Trade: getAccountProfileData(userID)
+        Trade->>SLSB: getAccountProfileData(userID)
+        SLSB->>EM: find(AccountProfileDataBean.class, userID)
+        EM->>DB: SELECT FROM accountprofileejb WHERE userid=?
+        DB-->>EM: Profile data
+        EM-->>SLSB: AccountProfileDataBean
+        SLSB-->>Trade: Profile data
+        Trade-->>Action: AccountProfileDataBean
+        
+        %% Get order history (if not long run mode)
+        alt TradeConfig.getLongRun() == false
+            Action->>Trade: getOrders(userID)
+            Trade->>SLSB: getOrders(userID)
+            SLSB->>EM: createNamedQuery("orderejb.findByAccountAccountid")
+            EM->>DB: SELECT FROM orderejb WHERE account_accountid=?
+            DB-->>EM: Orders collection
+            EM-->>SLSB: Collection<OrderDataBean>
+            SLSB-->>Trade: Order history
+            Trade-->>Action: ArrayList<OrderDataBean>
+        else Long run mode enabled
+            Action->>Action: Create empty ArrayList<Object>()
+            Note over Action: Skip order loading for performance
+        end
+        
+        Action->>Action: req.setAttribute("accountData", accountData)
+        Action->>Action: req.setAttribute("accountProfileData", profileData)
+        Action->>Action: req.setAttribute("orderDataBeans", orders)
+        Action->>Action: requestDispatch(account.jsp)
+        
+        Action-->>Servlet: Forward to account.jsp
+        Servlet->>JSP: Render account page
+        JSP->>User: Display account details, balance, and order history
+    end
+    
+    %% Account Profile Update Workflow
+    rect rgb(255, 248, 240)
+        Note over User, DB: 3. Account Profile Update Workflow
+        
+        User->>JSP: Navigate to account page and click "Update Profile"
+        JSP->>User: Display account update form
+        User->>JSP: Submit updated profile (password, name, address, email, cc)
+        JSP->>Servlet: POST /app?action=account&updateProfile=true
+        
+        Servlet->>Action: doAccountUpdate(ctx, req, resp, userID, password, cpassword, fullName, address, creditcard, email)
+        
+        %% Validate input data
+        Action->>Action: Validate password == cpassword
+        Action->>Action: Validate all fields are non-empty
+        
+        alt Validation passes
+            Action->>Action: Create new AccountProfileDataBean(userID, password, fullName, address, email, creditcard)
+            Action->>Trade: updateAccountProfile(accountProfileData)
+            Trade->>SLSB: updateAccountProfile(profileData)
+            
+            %% Update profile in database
+            SLSB->>EM: find(AccountProfileDataBean.class, userID)
+            EM->>DB: SELECT FROM accountprofileejb WHERE userid=?
+            DB-->>EM: Current profile
+            EM-->>SLSB: Current AccountProfileDataBean
+            
+            SLSB->>SLSB: Update profile fields (password, fullName, address, email, creditCard)
+            SLSB->>EM: merge(updatedProfile)
+            EM->>DB: UPDATE accountprofileejb SET passwd=?, fullname=?, address=?, email=?, creditcard=? WHERE userid=?
+            DB-->>EM: Update confirmation
+            EM-->>SLSB: Updated entity
+            
+            SLSB-->>Trade: Updated AccountProfileDataBean
+            Trade-->>Action: Updated profile
+            Action->>Action: results = "Account profile update successful"
+            
+        else Validation fails
+            Action->>Action: results = "Update profile error: [validation message]"
+            Note over Action: doUpdate = false, no database operation
+        end
+        
+        %% Redirect back to account page with results
+        Action->>Action: doAccount(ctx, req, resp, userID, results)
+        Note over Action: Calls account display workflow with success/error message
+    end
+    
+    %% Holding Details Workflow
+    rect rgb(255, 240, 255)
+        Note over User, DB: 4. Individual Holding Details Workflow
+        
+        User->>JSP: Click on specific holding from portfolio
+        JSP->>Servlet: GET /app?action=quotes&symbol=IBM
+        Servlet->>Action: doQuotes(ctx, req, resp, userID, symbol)
+        
+        Action->>Trade: getQuote(symbol)
+        Trade->>SLSB: getQuote(symbol)
+        SLSB->>EM: find(QuoteDataBean.class, symbol)
+        EM->>DB: SELECT FROM quoteejb WHERE symbol=?
+        DB-->>EM: Quote data with current price/volume
+        EM-->>SLSB: QuoteDataBean
+        SLSB-->>Trade: Current quote
+        Trade-->>Action: QuoteDataBean
+        
+        Action->>Action: req.setAttribute("quoteData", quote)
+        Action->>Action: req.setAttribute("symbol", symbol)
+        Action->>Action: requestDispatch(displayQuote.jsp)
+        
+        Action-->>Servlet: Forward to displayQuote.jsp
+        Servlet->>JSP: Render quote details page
+        JSP->>User: Display current quote with buy/sell options
+    end
+    
+    %% Error Handling Scenarios
+    Note over User, DB: Error Handling in Account Management
+    
+    alt User Not Found
+        SLSB->>EM: find(AccountProfileDataBean.class, invalidUserID)
+        EM->>DB: SELECT FROM accountprofileejb WHERE userid=?
+        DB-->>EM: null (no results)
+        EM-->>SLSB: null
+        SLSB-->>Trade: null
+        Trade-->>Action: null (triggers IllegalArgumentException)
+        Action->>Action: Log error and set error message
+        Action->>Action: requestDispatch(home.jsp with error)
+        Action-->>Servlet: Forward to error page
+        Servlet->>JSP: Display error message
+        JSP->>User: "Could not find account for userID"
+    end
+    
+    alt Database Connection Error
+        EM->>DB: Database operation
+        DB-->>EM: SQLException/Connection timeout
+        EM-->>SLSB: PersistenceException
+        SLSB-->>Trade: EJBException
+        Trade-->>Action: Exception caught
+        Action->>Action: Log exception details
+        Action-->>Servlet: throw ServletException
+        Servlet->>JSP: Forward to error.jsp
+        JSP->>User: Display system error message
+    end
+    
+    alt Profile Update Constraint Violation
+        EM->>DB: UPDATE accountprofileejb SET...
+        DB-->>EM: Constraint violation (e.g., duplicate email)
+        EM-->>SLSB: PersistenceException
+        SLSB-->>Trade: EJBException with constraint details
+        Trade-->>Action: Exception caught
+        Action->>Action: results = "Profile update failed: constraint violation"
+        Action->>Action: Call doAccount() with error message
+        Note over Action: User sees error on account page
+    end
+    
+    %% Performance and Caching Considerations
+    Note over User, DB: Performance Optimizations
+    
+    Action->>Action: Check TradeConfig.getLongRun()
+    alt Long run mode (performance testing)
+        Action->>Action: Skip order history loading
+        Action->>Action: Use empty order list
+        Note over Action: Reduces database load during benchmarks
+    else Normal mode
+        Action->>SLSB: Load full order history
+        Note over Action: Complete data for normal user experience
+    end
+    
+    SLSB->>SLSB: Lazy loading strategy for relationships
+    Note over SLSB: Account->Profile and Holding->Quote loaded on demand
+    
+    EM->>EM: L1 cache usage for repeated entity access
+    Note over EM: EntityManager caches entities within transaction scope

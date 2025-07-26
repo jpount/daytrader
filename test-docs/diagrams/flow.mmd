@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant User
+    participant Browser
+    participant Server
+    participant Database
+    
+    User->>Browser: Enter credentials
+    Browser->>Server: POST /login
+    Server->>Database: Verify user
+    Database-->>Server: User data
+    Server-->>Browser: JWT token
+    Browser-->>User: Show dashboard

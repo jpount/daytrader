@@ -1,0 +1,41 @@
+graph LR
+    subgraph "Service Implementation Patterns"
+        
+        subgraph "Service Interface Pattern"
+            CLIENT[Client Code<br/>Servlets, JSF Beans<br/>Performance Tests] --> INTERFACE[Service Interface<br/>TradeServices<br/>Business contract]
+            INTERFACE --> IMPL1[EJB Implementation<br/>TradeSLSBBean<br/>Full container services]
+            INTERFACE --> IMPL2[Direct Implementation<br/>DirectSLSBBean<br/>Optimized performance]
+        end
+
+        subgraph "Dependency Injection Chain"
+            WEB[Web Components<br/>@EJB injection] --> LOCAL[Local Interface<br/>TradeSLSBLocal<br/>Container proxy]
+            LOCAL --> BEAN[Session Bean<br/>TradeSLSBBean<br/>Business logic]
+            BEAN --> RESOURCES[Injected Resources<br/>@Resource @PersistenceContext<br/>Infrastructure services]
+        end
+
+        subgraph "Service Locator Chain"
+            ACTION[TradeAction<br/>Service facade] --> LOCATOR[Service Locator<br/>JNDI lookup logic]
+            LOCATOR --> JNDI[JNDI Context<br/>java:comp/env/<br/>Naming service]
+            JNDI --> REFERENCE[EJB Reference<br/>Local/Remote stub<br/>Container proxy]
+        end
+
+        subgraph "Message-Driven Service Pattern"
+            JMS[JMS Message<br/>Queue/Topic] --> MDB[Message-Driven Bean<br/>@MessageDriven<br/>Async processing]
+            MDB --> SERVICE[Injected Service<br/>@EJB TradeSLSBLocal<br/>Business delegation]
+            SERVICE --> PERSISTENCE[Persistence Context<br/>@PersistenceContext<br/>Data operations]
+        end
+    end
+
+    classDef pattern fill:#E0F2F1,stroke:#00796B,stroke-width:2px
+    classDef interface fill:#E1F5FE,stroke:#0277BD,stroke-width:2px
+    classDef implementation fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+    classDef web fill:#FFF3E0,stroke:#F57C00,stroke-width:2px
+    classDef jndi fill:#FFF8E1,stroke:#FBC02D,stroke-width:2px
+    classDef message fill:#E8F5E8,stroke:#388E3C,stroke-width:2px
+
+    class CLIENT,WEB,ACTION web
+    class INTERFACE,LOCAL interface
+    class IMPL1,IMPL2,BEAN,SERVICE implementation
+    class LOCATOR,JNDI,REFERENCE jndi
+    class JMS,MDB,PERSISTENCE message
+    class RESOURCES pattern

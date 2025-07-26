@@ -1,0 +1,38 @@
+# Build directories
+/target/
+/build/
+/bin/
+
+# IDE files
+.classpath
+.project
+/.settings/
+.factorypath
+/.gradle
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+
+# Mac OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.local

@@ -1,0 +1,86 @@
+sequenceDiagram
+    title User Authentication Flow
+    
+    participant User
+    participant Browser
+    participant JSP as welcome.jsp
+    participant Servlet as TradeAppServlet
+    participant Action as TradeServletAction
+    participant TradeEJB as TradeAction
+    participant SLSB as TradeSLSBBean
+    participant Account as AccountDataBean
+    participant Profile as AccountProfileDataBean
+    participant DB as Database
+    
+    %% Login Request Flow
+    User->>Browser: Enter credentials
+    Browser->>JSP: GET /daytrader/welcome.jsp
+    JSP-->>Browser: Display login form
+    Browser->>User: Show login page
+    
+    User->>Browser: Submit login (uid, password)
+    Browser->>Servlet: POST /daytrader/app<br/>action=login<br/>uid=user123<br/>passwd=xxx
+    
+    %% Authentication Processing
+    Servlet->>Servlet: Extract parameters
+    Servlet->>Action: doLogin(req, resp, uid, passwd)
+    
+    Action->>TradeEJB: login(uid, passwd)
+    Note over TradeEJB: Delegates based on runtime mode
+    
+    TradeEJB->>SLSB: login(uid, passwd)
+    SLSB->>DB: EntityManager.find()<br/>AccountProfileDataBean
+    DB-->>SLSB: AccountProfile
+    
+    alt User not found
+        SLSB-->>Action: throw EJBException<br/>"User not found"
+        Action-->>Servlet: Set error in request
+        Servlet-->>JSP: Forward to welcome.jsp
+        JSP-->>Browser: Display error message
+        Browser-->>User: "Invalid User"
+    else User found
+        SLSB->>Account: account.login(password)
+        Account->>Profile: getPassword()
+        Profile-->>Account: storedPassword
+        
+        alt Password mismatch
+            Account-->>SLSB: throw EJBException<br/>"Invalid password"
+            SLSB-->>Action: throw EJBException
+            Action-->>Servlet: Set error in request
+            Servlet-->>JSP: Forward to welcome.jsp
+            JSP-->>Browser: Display error message
+            Browser-->>User: "Invalid Password"
+        else Password matches
+            Account->>Account: Update lastLogin<br/>Increment loginCount
+            Account->>DB: Persist changes
+            Account-->>SLSB: Return AccountDataBean
+            SLSB-->>TradeEJB: Return AccountDataBean
+            TradeEJB-->>Action: Return AccountDataBean
+            
+            %% Session Creation
+            Action->>Action: Create HTTP Session
+            Action->>Action: session.setAttribute("uidBean", uid)
+            Action->>Action: session.setAttribute("sessionCreationDate", date)
+            
+            Action-->>Servlet: Success response
+            Servlet-->>Browser: Redirect to /daytrader/app?action=home
+            Browser->>Servlet: GET /daytrader/app?action=home
+            Servlet->>Servlet: Validate session
+            Servlet-->>Browser: Display home page
+            Browser-->>User: "Welcome! Ready to Trade"
+        end
+    end
+    
+    %% Logout Flow
+    User->>Browser: Click Logout
+    Browser->>Servlet: GET /daytrader/app?action=logout
+    Servlet->>Action: doLogout(req, resp, uid)
+    Action->>TradeEJB: logout(uid)
+    TradeEJB->>SLSB: logout(uid)
+    SLSB->>Account: Update logoutCount
+    SLSB->>DB: Persist changes
+    SLSB-->>Action: Success
+    Action->>Action: session.invalidate()
+    Action-->>Servlet: Success response
+    Servlet-->>Browser: Redirect to welcome.jsp
+    Browser-->>User: "Logout successful"

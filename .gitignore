@@ -1,0 +1,87 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+
+# Editor directories and files
+.idea
+.vscode
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Mac OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Documentation specific
+docs/**/*.tmp
+docs/**/*.cache
+docs/**/*.bak
+docs/**/~*
+docs/**/.*.swp
+
+# Keep all markdown and diagram source files
+!docs/**/*.md
+!docs/**/*.mmd
+!docs/diagrams/*.mmd
+
+# Keep generated diagrams for easy viewing
+!docs/diagrams/*.png
+!docs/diagrams/*.svg
+
+# Temporary build artifacts
+docs/build/
+docs/.temp/
+
+# Java
+target/
+build/
+*.jar
+*.war
+#*.ear
+*.class
+*.log
+*.tmp
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Dependency directories
+node_modules/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+docker-compose.override.yml
+.docker/

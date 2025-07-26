@@ -1,0 +1,191 @@
+flowchart TB
+    %% JSP Request-Response Flow Architecture
+    
+    subgraph "Client Browser"
+        User[User Action]
+        Form[HTML Form]
+        Link[Navigation Link]
+    end
+    
+    subgraph "Web Container"
+        subgraph "Filters"
+            OrderFilter["OrdersAlertFilter<br/>@WebFilter - /app"]
+        end
+        
+        subgraph "Servlets"
+            AppServlet["TradeAppServlet<br/>@WebServlet - /app"]
+            ConfigServlet["TradeConfigServlet<br/>@WebServlet - /config"]
+            ScenarioServlet["TradeScenarioServlet<br/>@WebServlet - /scenario"]
+        end
+        
+        subgraph "Servlet Actions"
+            TSA["TradeServletAction<br/>Action Handler"]
+            CSA[Config Actions]
+        end
+    end
+    
+    subgraph "Business Layer"
+        subgraph "Service Interface"
+            TradeAction["TradeAction<br/>Business Logic"]
+            TradeServices["TradeServices<br/>Interface"]
+        end
+        
+        subgraph "EJB Layer"
+            SLSB["TradeSLSBBean<br/>Session Bean"]
+            DirectSLSB["DirectSLSBBean<br/>Direct Access"]
+            MDB["Message-Driven Beans<br/>Async Processing"]
+        end
+        
+        subgraph "Direct Access"
+            TradeDirect["TradeDirect<br/>JDBC Access"]
+        end
+    end
+    
+    subgraph "Data Layer"
+        subgraph "JPA Entities"
+            AccountBean[AccountDataBean]
+            OrderBean[OrderDataBean]
+            QuoteBean[QuoteDataBean]
+            HoldingBean[HoldingDataBean]
+            ProfileBean[AccountProfileDataBean]
+        end
+        
+        subgraph "Database"
+            DB[(Apache Derby<br/>Database)]
+        end
+    end
+    
+    subgraph "Messaging"
+        Queue["TradeBrokerQueue"]
+        Topic["TradeStreamerTopic"]
+    end
+    
+    subgraph "View Layer - JSP Pages"
+        subgraph "Authentication"
+            Welcome["welcome.jsp<br/>Login Page"]
+            Register["register.jsp<br/>Registration"]
+        end
+        
+        subgraph "Trading"
+            Quote["quote.jsp<br/>Quote Lookup"]
+            DisplayQuote["displayQuote.jsp<br/>Quote Display"]
+            Order["order.jsp<br/>Order Confirmation"]
+            Portfolio["portfolio.jsp<br/>Holdings View"]
+        end
+        
+        subgraph "Account Management"
+            Account["account.jsp<br/>Account Dashboard"]
+            TradeHome["tradehome.jsp<br/>Trading Home"]
+        end
+        
+        subgraph "Admin"
+            Config["config.jsp<br/>Configuration"]
+            RunStats["runStats.jsp<br/>Statistics"]
+            Error["error.jsp<br/>Error Page"]
+        end
+        
+        subgraph "Market"
+            MarketSummary["marketSummary.jsp<br/>Market Widget"]
+        end
+    end
+    
+    %% User Interactions
+    User -->|Click/Submit| Form
+    User -->|Click| Link
+    Form -->|POST/GET| OrderFilter
+    Link -->|GET| OrderFilter
+    
+    %% Filter Chain
+    OrderFilter -->|Check Orders| AppServlet
+    OrderFilter -.->|Set closedOrders| AppServlet
+    
+    %% Servlet Routing
+    AppServlet -->|action=*| TSA
+    ConfigServlet -->|config actions| CSA
+    
+    %% Action Processing
+    TSA -->|login| Welcome
+    TSA -->|register| Register
+    TSA -->|quotes| Quote
+    TSA -->|buy/sell| TradeAction
+    TSA -->|portfolio| Portfolio
+    TSA -->|account| Account
+    TSA -->|home| TradeHome
+    TSA -->|logout| Welcome
+    
+    %% Business Logic Flow
+    TradeAction -->|EJB3 Mode| SLSB
+    TradeAction -->|Direct Mode| TradeDirect
+    TradeAction <-.->|implements| TradeServices
+    
+    %% EJB Processing
+    SLSB -->|JPA| AccountBean
+    SLSB -->|JPA| OrderBean
+    SLSB -->|JPA| QuoteBean
+    SLSB -->|JPA| HoldingBean
+    SLSB -->|JPA| ProfileBean
+    
+    %% Direct JDBC
+    TradeDirect -->|JDBC| DB
+    
+    %% JPA Persistence
+    AccountBean -->|persist| DB
+    OrderBean -->|persist| DB
+    QuoteBean -->|persist| DB
+    HoldingBean -->|persist| DB
+    ProfileBean -->|persist| DB
+    
+    %% Async Processing
+    SLSB -.->|Async Orders| Queue
+    Queue -.->|onMessage| MDB
+    MDB -.->|Publish| Topic
+    
+    %% JSP Data Flow
+    TSA -->|setAttribute| Welcome
+    TSA -->|setAttribute| Register
+    TSA -->|setAttribute| Quote
+    TSA -->|setAttribute| Portfolio
+    TSA -->|setAttribute| Account
+    TSA -->|setAttribute| TradeHome
+    TSA -->|setAttribute| Order
+    
+    %% JSP Includes
+    TradeHome -.->|include| MarketSummary
+    Quote -.->|include| DisplayQuote
+    
+    %% Direct JSP Access
+    DisplayQuote -->|Direct| TradeAction
+    MarketSummary -->|Direct| TradeAction
+    
+    %% Response Flow
+    Welcome -->|HTML| User
+    Register -->|HTML| User
+    Quote -->|HTML| User
+    Portfolio -->|HTML| User
+    Account -->|HTML| User
+    TradeHome -->|HTML| User
+    Order -->|HTML| User
+    Config -->|HTML| User
+    RunStats -->|HTML| User
+    Error -->|HTML| User
+    
+    %% Error Handling
+    AppServlet -.->|Exception| Error
+    TSA -.->|Error| Error
+    
+    %% Styling
+    classDef client fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef filter fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef servlet fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    classDef business fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef data fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef jsp fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef msg fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    
+    class User,Form,Link client
+    class OrderFilter filter
+    class AppServlet,ConfigServlet,ScenarioServlet,TSA,CSA servlet
+    class TradeAction,TradeServices,SLSB,DirectSLSB,TradeDirect business
+    class AccountBean,OrderBean,QuoteBean,HoldingBean,ProfileBean,DB data
+    class Welcome,Register,Quote,DisplayQuote,Order,Portfolio,Account,TradeHome,Config,RunStats,Error,MarketSummary jsp
+    class Queue,Topic,MDB msg

@@ -1,0 +1,151 @@
+graph TB
+    %% Title and Description
+    Title[DayTrader3 System Architecture Overview]
+    
+    %% External Clients
+    subgraph "External Clients"
+        Browser[Web Browser]
+        Mobile[Mobile App]
+        ExtSystem[External Trading Systems]
+    end
+    
+    %% WebSphere Liberty Server Container
+    subgraph "WebSphere Liberty Server"
+        %% EAR Deployment
+        subgraph "daytrader3-ee6.ear"
+            %% Presentation Tier
+            subgraph "Presentation Tier [daytrader3-ee6-web]"
+                subgraph "Web Components"
+                    JSP[JSP Pages<br/>- tradehome.jsp<br/>- portfolio.jsp<br/>- account.jsp<br/>- quote.jsp<br/>- order.jsp<br/>- marketSummary.jsp]
+                    Servlets[Servlets<br/>- TradeAppServlet<br/>- TradeConfigServlet<br/>- TradeScenarioServlet<br/>- TradeBuildDB]
+                    JSF[JSF Beans<br/>- AccountBean<br/>- QuoteBean]
+                    Filters[Filters & Listeners<br/>- OrdersAlertFilter<br/>- TradeWebContextListener]
+                end
+                
+                subgraph "Performance Testing"
+                    PerfServlets[Performance Servlets<br/>- PingServlet<br/>- PingServletEJB<br/>- PingServletJDBC<br/>- PingServletJMS]
+                end
+            end
+            
+            %% REST API Tier
+            subgraph "REST API Tier [daytrader3-ee6-rest]"
+                REST[REST Services<br/>- AddressBook API<br/>- /addresses/*]
+            end
+            
+            %% Business Tier
+            subgraph "Business Tier [daytrader3-ee6-ejb]"
+                subgraph "Session Beans"
+                    SLSB[Stateless Session Beans<br/>- TradeSLSBBean<br/>- DirectSLSBBean]
+                    TradeAction[TradeAction<br/>Business Logic<br/>- EJB3 Mode<br/>- DIRECT Mode<br/>- SESSION3 Mode]
+                    TradeServices[TradeServices<br/>Interface]
+                end
+                
+                subgraph "Message-Driven Beans"
+                    MDB[Message-Driven Beans<br/>- DTBroker3MDB<br/>- DTStreamer3MDB]
+                end
+                
+                subgraph "Business Services"
+                    TradeDirect[TradeDirect<br/>Direct JDBC Access]
+                    TradeConfig[TradeConfig<br/>Runtime Configuration]
+                    Utils[Utilities<br/>- FinancialUtils<br/>- Log<br/>- MDBStats<br/>- KeyBlock]
+                end
+            end
+            
+            %% Data Tier
+            subgraph "Data Tier"
+                subgraph "JPA Entities"
+                    Entities[JPA Entity Beans<br/>- AccountDataBean<br/>- AccountProfileDataBean<br/>- HoldingDataBean<br/>- OrderDataBean<br/>- QuoteDataBean<br/>- MarketSummaryDataBean<br/>- RunStatsDataBean]
+                end
+                
+                subgraph "Database"
+                    DB[(Derby Database<br/>Tables:<br/>- ACCOUNTEJB<br/>- ACCOUNTPROFILEEJB<br/>- HOLDINGEJB<br/>- ORDEREJB<br/>- QUOTEEJB<br/>- KEYGENEJB)]
+                end
+            end
+            
+            %% JMS Infrastructure
+            subgraph "JMS Infrastructure"
+                Queue[JMS Queue<br/>TradeBrokerQueue]
+                Topic[JMS Topic<br/>TradeStreamerTopic]
+            end
+            
+            %% Configuration
+            subgraph "Configuration"
+                Config[Configuration Files<br/>- server.xml<br/>- persistence.xml<br/>- web.xml<br/>- ejb-jar.xml<br/>- application.xml]
+            end
+        end
+    end
+    
+    %% Client connections
+    Browser -->|HTTP/HTTPS| JSP
+    Browser -->|HTTP/HTTPS| Servlets
+    Mobile -->|REST/JSON| REST
+    ExtSystem -->|REST/JSON| REST
+    
+    %% Presentation to Business tier
+    JSP -->|Request| JSF
+    JSF -->|EJB Local| TradeAction
+    Servlets -->|EJB Local| TradeAction
+    REST -->|EJB Local| TradeAction
+    PerfServlets -->|Direct Call| SLSB
+    PerfServlets -->|JDBC| DB
+    
+    %% Business tier internal flows
+    TradeAction -->|"Runtime Mode:<br/>EJB3"| SLSB
+    TradeAction -->|"Runtime Mode:<br/>DIRECT"| TradeDirect
+    TradeAction <-.->|implements| TradeServices
+    
+    %% Session Bean interactions
+    SLSB -->|"JPA persist()"| Entities
+    SLSB -->|"JPA query()"| Entities
+    
+    %% Direct JDBC access
+    TradeDirect -->|JDBC| DB
+    
+    %% JPA to Database
+    Entities -->|JPA/Hibernate| DB
+    
+    %% Async messaging flows
+    TradeAction -->|"Async Order<br/>Processing"| Queue
+    Queue -->|JMS Message| MDB
+    MDB -->|"Market Data<br/>Streaming"| Topic
+    MDB -->|Update Orders| SLSB
+    
+    %% Configuration flows
+    Config -.->|loads| TradeConfig
+    TradeConfig -.->|configures| TradeAction
+    Config -.->|DataSource| DB
+    Config -.->|JMS Config| Queue
+    Config -.->|JMS Config| Topic
+    
+    %% Styling
+    classDef external fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef presentation fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef business fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef data fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    classDef infra fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef config fill:#f5f5f5,stroke:#424242,stroke-width:2px
+    
+    class Browser,Mobile,ExtSystem external
+    class JSP,Servlets,JSF,Filters,PerfServlets,REST presentation
+    class SLSB,TradeAction,TradeServices,MDB,TradeDirect,TradeConfig,Utils business
+    class Entities,DB data
+    class Queue,Topic infra
+    class Config config
+    class Title title
+    
+    %% Legend
+    subgraph "Legend"
+        L1[→ Synchronous Call]
+        L2[--> Asynchronous Message]  
+        L3[-.-> Configuration/Dependency]
+        L4[External System]:::external
+        L5[Presentation Component]:::presentation
+        L6[Business Component]:::business
+        L7[Data Component]:::data
+        L8[Infrastructure]:::infra
+    end
+    
+    %% Hide title node connections
+    Title -.-> Title
+    
+    classDef title fill:#fff,stroke:#fff,color:#000,font-weight:bold,font-size:16px
