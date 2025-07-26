@@ -13,6 +13,8 @@ dev-debug.log
 .vscode/
 .claude/
 .taskmaster/
+# mcp.json
+.mcp.json
 *.suo
 *.ntvs*
 *.njsproj

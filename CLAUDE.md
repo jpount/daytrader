@@ -4,101 +4,85 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-DayTrader3 is a Java EE6 benchmark application simulating an online stock trading system. It's a multi-module Maven/Gradle project designed to run on WebSphere Liberty Server.
+DayTrader3 is a Java EE6 benchmark application that simulates an online stock trading system. It's built as a multi-module Maven/Gradle project using WebSphere Liberty as the application server.
 
-## Key Commands
+## Architecture
 
-### Build Commands
+The project uses a multi-module structure:
+- **daytrader3-ee6-ejb**: Core business logic with EJB3 beans, JPA entities, and trading services
+- **daytrader3-ee6-web**: Web tier with servlets, JSPs, and JSF components
+- **daytrader3-ee6-rest**: REST API implementation
+- **daytrader3-ee6**: Enterprise application packaging (EAR)
+- **daytrader3-ee6-wlpcfg**: WebSphere Liberty server configuration and deployment
+
+## Common Development Commands
+
+### Building the Application
+
 ```bash
 # Build with Maven (requires Java 7 compatibility)
-cd app
-mvn clean install -Dmaven.compiler.source=1.7 -Dmaven.compiler.target=1.7
+mvn clean install -Dmaven.compiler.source=1.7 -Dmaven.compiler.target=1.7 -DskipTests
 
-# Build with Gradle (alternative)
-cd app
-gradle clean build
-
-# Build using Docker (recommended)
-docker run --rm -v $(pwd):/workspace -w /workspace daytrader-java7 mvn clean install -Dmaven.compiler.source=1.7 -Dmaven.compiler.target=1.7 -DskipTests
+# Build with Gradle
+gradle build
 ```
 
 ### Running the Application
+
 ```bash
-# Start with docker-compose
-cd app
-docker compose up
+# Using Docker Compose (recommended)
+docker-compose up
 
 # The application will be available at:
-# - Web UI: http://localhost:9083/daytrader
-# - REST API: http://localhost:9083/daytrader/api/trade
-# - Config: http://localhost:9083/daytrader/config
+# - http://localhost:9083/daytrader (main web interface)
+# - http://localhost:9083/daytrader/api/trade (REST API)
 ```
 
 ### Database Setup
+
+After starting the server, initialize the database:
+1. Create tables: http://localhost:9083/daytrader/config?action=buildDBTables
+2. Populate data: http://localhost:9083/daytrader/config?action=buildDB
+
+Default login: uid:0 / password: xxx
+
+### Docker Build
+
 ```bash
-# After starting the application, initialize the database:
-# 1. Create tables: http://localhost:9083/daytrader/config?action=buildDBTables
-# 2. Populate data: http://localhost:9083/daytrader/config?action=buildDB
+# Build the Java 7 compatible Docker image
+docker build -f Dockerfile.java7 -t daytrader-java7 .
 ```
 
-### Testing
-```bash
-# Run unit tests
-cd app
-mvn test
+## Key Components and Patterns
 
-# Skip tests during build
-mvn clean install -DskipTests
-```
+### Business Logic (daytrader3-ee6-ejb)
+- **TradeServices**: Main service interface defining trading operations
+- **TradeDirect**: Direct JDBC implementation of trading services
+- **TradeSLSBBean**: Stateless session bean implementation
+- **JPA Entities**: AccountDataBean, OrderDataBean, QuoteDataBean, HoldingDataBean
+- **Message-Driven Beans**: DTBroker3MDB, DTStreamer3MDB for async processing
 
-## Architecture Overview
+### Web Layer (daytrader3-ee6-web)
+- **TradeAppServlet**: Main application servlet handling user interactions
+- **TradeServletAction**: Controller logic for web operations
+- **TradeBuildDB**: Database initialization servlet
+- **Primitives**: Performance testing servlets (PingServlet*)
 
-### Module Structure
-- **daytrader3-ee6-ejb**: Business logic layer with EJBs, JPA entities, and message-driven beans
-- **daytrader3-ee6-web**: Web presentation layer with servlets, JSPs, and web controllers
-- **daytrader3-ee6-rest**: RESTful API endpoints
-- **daytrader3-ee6**: EAR packaging module that bundles all components
-- **daytrader3-ee6-wlpcfg**: WebSphere Liberty server configuration and Derby database setup
+### Configuration
+- JPA persistence configured via persistence.xml
+- WebSphere Liberty server configuration in server.xml
+- Derby database used by default (can be changed)
 
-### Key Technologies
-- **Runtime**: WebSphere Liberty Server (Java EE6)
-- **Database**: Apache Derby (embedded)
-- **Build**: Maven (primary) and Gradle
-- **Container**: Docker with docker-compose
-- **API**: JAX-RS REST services at `/daytrader/api/trade`
-- **UI**: Servlets and JSPs at `/daytrader`
+## Testing Approach
 
-### Important Paths
-- Server configuration: `app/daytrader3-ee6-wlpcfg/servers/daytrader3_Sample/server.xml`
-- JPA configuration: `app/daytrader3-ee6-ejb/src/main/resources/META-INF/persistence.xml`
-- Web deployment descriptor: `app/daytrader3-ee6-web/src/main/webapp/WEB-INF/web.xml`
-- EJB configuration: `app/daytrader3-ee6-ejb/src/main/resources/META-INF/ejb-jar.xml`
+The application includes:
+- Performance primitives for testing individual Java EE components
+- JMeter test files in jmeter_files/ for load testing
+- No unit tests in the codebase - testing is done via integration/load testing
 
-### Core Business Logic
-The trading services are implemented in the EJB module:
-- **TradeServices**: Main interface for trading operations
-- **TradeAction**: Implementation of trading logic
-- **Entities**: Account, AccountProfile, Holding, Order, Quote in `com.ibm.websphere.samples.daytrader.entities`
-- **Message Beans**: TradeBrokerMDB, TradeStreamerMDB for asynchronous processing
+## Important Notes
 
-### Documentation Requirements
-The project requires comprehensive documentation including:
-1. Architecture diagrams (Mermaid) in `docs/diagrams/`
-2. Technical class documentation in `docs/technical-documentation.md`
-3. Security assessment in `docs/security-assessment.md`
-4. Performance assessment in `docs/performance-assessment.md`
-
-### Development Notes
-- The application targets Java 7 but runs on Java 8 runtime
-- Default login credentials: uid:0/xxx
-- Derby database files are stored in the Liberty server directory
-- JMeter test files are included for performance testing
-- The application includes performance testing primitives accessible via the web UI
-
-## Task Master AI Instructions
-**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
-@./.taskmaster/CLAUDE.md
-
-
-## Key Requirements
-Create a full set of detailed documentation and diagrams about the system
+- The application targets Java EE6 specification
+- Uses Java 7 compatibility for compilation
+- Derby database files are stored in daytrader3-ee6-wlpcfg/shared/resources/data/tradedb/
+- Transaction logs stored in daytrader3-ee6-wlpcfg/servers/daytrader3_Sample/tranlog/
