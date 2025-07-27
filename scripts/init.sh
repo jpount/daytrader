@@ -27,6 +27,12 @@ mkdir -p "${DOCS_DIR}/business-logic"
 mkdir -p "${DOCS_DIR}/data-models"
 mkdir -p "${DOCS_DIR}/api"
 mkdir -p "${DOCS_DIR}/diagrams"
+mkdir -p "${DOCS_DIR}/diagrams/architecture"
+mkdir -p "${DOCS_DIR}/diagrams/data-flow"
+mkdir -p "${DOCS_DIR}/diagrams/entity-relationship"
+mkdir -p "${DOCS_DIR}/diagrams/sequence"
+mkdir -p "${DOCS_DIR}/diagrams/component"
+mkdir -p "${DOCS_DIR}/diagrams/deployment"
 mkdir -p "${DOCS_DIR}/modernisation"
 
 echo -e "${GREEN}✓ Directory structure created${NC}"
@@ -57,6 +63,12 @@ This directory contains comprehensive documentation generated from the codebase 
 - `data-models/` - Data structures and relationships
 - `api/` - API endpoints and interfaces
 - `diagrams/` - Visual representations (Mermaid .mmd files)
+  - `architecture/` - System architecture diagrams
+  - `data-flow/` - Data flow diagrams
+  - `entity-relationship/` - Database schema diagrams
+  - `sequence/` - Workflow sequence diagrams
+  - `component/` - Component dependency diagrams
+  - `deployment/` - Deployment and infrastructure diagrams
 - `modernisation/` - Migration and modernisation recommendations
 
 ## Generation

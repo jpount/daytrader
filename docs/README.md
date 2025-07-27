@@ -10,6 +10,12 @@ This directory contains comprehensive documentation generated from the codebase 
 - `data-models/` - Data structures and relationships
 - `api/` - API endpoints and interfaces
 - `diagrams/` - Visual representations (Mermaid .mmd files)
+  - `architecture/` - System architecture diagrams
+  - `data-flow/` - Data flow diagrams
+  - `entity-relationship/` - Database schema diagrams
+  - `sequence/` - Workflow sequence diagrams
+  - `component/` - Component dependency diagrams
+  - `deployment/` - Deployment and infrastructure diagrams
 - `modernisation/` - Migration and modernisation recommendations
 
 ## Generation
