@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(chmod:*)",
+      "Bash(ls:*)",
+      "Bash(npx:*)",
+      "Bash(npm search:*)",
+      "Bash(npm view:*)",
+      "Bash(find:*)",
+      "Bash(rm:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "disabledMcpjsonServers": [
+    "sqlite"
+  ]
+}

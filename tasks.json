@@ -1,0 +1,137 @@
+{
+  "name": "Universal Codebase Documentation System",
+  "description": "Comprehensive documentation generator for any codebase with modernization recommendations",
+  "version": "2.0",
+  "tasks": [
+    {
+      "id": "01-init",
+      "name": "Initialize Documentation Structure",
+      "description": "Create documentation directories",
+      "command": "bash scripts/init.sh",
+      "type": "shell",
+      "status": "pending"
+    },
+    {
+      "id": "02-codebase-analysis",
+      "name": "Codebase Analysis and Technology Detection",
+      "description": "Identify technology stack and project structure",
+      "prompt": "Analyze the codebase in the /app directory:\n\n1. Identify the technology stack:\n   - Programming language(s) and versions\n   - Frameworks and libraries used\n   - Build tools (Maven, Gradle, npm, etc.)\n   - Database technology\n   - Frontend technology (if any)\n\n2. Project structure:\n   - Module organization\n   - Package/namespace conventions\n   - Key directories and their purposes\n\n3. Configuration files:\n   - Build configuration\n   - Dependency management\n   - Application configuration\n\n4. Initial statistics:\n   - Total files by type\n   - Lines of code\n   - Module count\n\n5. Create a technology profile\n\nSave comprehensive analysis to: docs/analysis/codebase-overview.md",
+      "outputFile": "docs/analysis/codebase-overview.md",
+      "status": "pending"
+    },
+    {
+      "id": "03-component-inventory",
+      "name": "Component Inventory",
+      "description": "Create detailed inventory of all components",
+      "prompt": "Create a comprehensive component inventory:\n\n1. Based on the technology detected, identify all components:\n   - For Java: Classes, interfaces, enums, annotations\n   - For .NET: Classes, interfaces, structs, delegates\n   - For any: Controllers, services, models, utilities\n\n2. Categorize by architectural role:\n   - Presentation/UI components\n   - Business logic components\n   - Data access components\n   - Utility/helper components\n   - Configuration components\n\n3. For each component document:\n   - Full name and namespace/package\n   - File location\n   - Type and role\n   - Key dependencies\n   - Annotations/attributes\n   - Primary responsibility\n\n4. Create summary statistics\n\n5. Identify entry points\n\nSave to: docs/analysis/component-inventory.md",
+      "outputFile": "docs/analysis/component-inventory.md",
+      "status": "pending"
+    },
+    {
+      "id": "04-architecture-analysis",
+      "name": "Architecture Analysis",
+      "description": "Document system architecture and patterns",
+      "prompt": "Analyze and document the system architecture:\n\n1. Identify architectural style:\n   - Monolithic, microservices, modular\n   - Layered, hexagonal, event-driven\n   - Client-server, n-tier\n\n2. Document layers/tiers:\n   - Presentation layer components\n   - Business logic layer\n   - Data access layer\n   - Integration layer\n\n3. Identify design patterns:\n   - Creational patterns\n   - Structural patterns\n   - Behavioral patterns\n   - Architecture patterns\n\n4. Dependencies and coupling:\n   - Inter-module dependencies\n   - External dependencies\n   - Coupling analysis\n\n5. Create architecture diagram showing:\n   - Major components\n   - Data flow\n   - Integration points\n\nSave documentation to: docs/architecture/architecture-analysis.md\nSave diagram to: docs/diagrams/system-architecture.mmd",
+      "outputFile": "docs/architecture/architecture-analysis.md",
+      "additionalOutputs": ["docs/diagrams/system-architecture.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "05-api-interfaces",
+      "name": "API and Interface Documentation",
+      "description": "Document all APIs and external interfaces",
+      "prompt": "Document all APIs and interfaces:\n\n1. Identify API types:\n   - REST APIs\n   - SOAP services\n   - GraphQL endpoints\n   - RPC interfaces\n   - Message queues\n   - Event streams\n\n2. For each API endpoint/operation:\n   - URL/Address pattern\n   - Method/Operation name\n   - Input parameters/schema\n   - Output format/schema\n   - Authentication requirements\n   - Error responses\n\n3. Internal interfaces:\n   - Service interfaces\n   - Repository interfaces\n   - Plugin interfaces\n\n4. Integration points:\n   - External system connections\n   - Database connections\n   - Third-party services\n\n5. Create API catalog\n\nSave to: docs/api/api-documentation.md",
+      "outputFile": "docs/api/api-documentation.md",
+      "status": "pending"
+    },
+    {
+      "id": "06-data-model",
+      "name": "Data Model Analysis",
+      "description": "Document data structures and persistence",
+      "prompt": "Analyze and document the data model:\n\n1. Identify data storage:\n   - Database type and version\n   - ORM/Data access technology\n   - File-based storage\n   - Cache systems\n\n2. Document entities/tables:\n   - Name and purpose\n   - Fields/columns with types\n   - Primary keys\n   - Indexes\n   - Constraints\n\n3. Relationships:\n   - Foreign keys\n   - Association types (1:1, 1:N, M:N)\n   - Cascade rules\n\n4. Data access patterns:\n   - Repository/DAO methods\n   - Query patterns\n   - Transaction boundaries\n\n5. Create ER diagram\n\nSave documentation to: docs/data-models/data-model-analysis.md\nSave ER diagram to: docs/diagrams/er-diagram.mmd",
+      "outputFile": "docs/data-models/data-model-analysis.md",
+      "additionalOutputs": ["docs/diagrams/er-diagram.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "07-business-logic",
+      "name": "Business Logic and Flow Analysis",
+      "description": "Extract business rules and process flows",
+      "prompt": "Extract and document business logic:\n\n1. Identify major business processes:\n   - User workflows\n   - System processes\n   - Batch operations\n   - Scheduled tasks\n\n2. For each major flow:\n   - Entry point\n   - Step-by-step process\n   - Decision points\n   - Data transformations\n   - External calls\n   - Error handling\n\n3. Business rules:\n   - Validation rules\n   - Calculation logic\n   - Business constraints\n   - Authorization rules\n\n4. State management:\n   - State machines\n   - Status transitions\n   - Lifecycle management\n\n5. Create sequence diagrams for major flows\n\nSave documentation to: docs/business-logic/business-flows.md\nSave diagrams to: docs/diagrams/business-flows.mmd",
+      "outputFile": "docs/business-logic/business-flows.md",
+      "additionalOutputs": ["docs/diagrams/business-flows.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "08-security-analysis",
+      "name": "Security and Authentication Analysis",
+      "description": "Document security implementation",
+      "prompt": "Analyze security implementation:\n\n1. Authentication:\n   - Authentication method (forms, JWT, OAuth, etc.)\n   - User storage\n   - Password policies\n   - Session management\n\n2. Authorization:\n   - Role-based access\n   - Permission systems\n   - Resource protection\n\n3. Security measures:\n   - Input validation\n   - SQL injection prevention\n   - XSS protection\n   - CSRF protection\n\n4. Sensitive data:\n   - Encryption usage\n   - Secure storage\n   - Data masking\n\n5. Security vulnerabilities:\n   - Identified issues\n   - Recommendations\n\nSave to: docs/analysis/security-analysis.md",
+      "outputFile": "docs/analysis/security-analysis.md",
+      "status": "pending"
+    },
+    {
+      "id": "09-performance-quality",
+      "name": "Performance and Code Quality Analysis",
+      "description": "Analyze performance characteristics and code quality",
+      "prompt": "Analyze performance and code quality:\n\n1. Performance characteristics:\n   - Caching strategies\n   - Database query patterns\n   - Async operations\n   - Resource pooling\n   - Load handling\n\n2. Code quality indicators:\n   - Code duplication\n   - Complexity hotspots\n   - Long methods/classes\n   - Coupling issues\n\n3. Technical debt:\n   - Deprecated usage\n   - Anti-patterns\n   - Missing abstractions\n   - Hard-coded values\n\n4. Testing:\n   - Test coverage\n   - Test types present\n   - Testing patterns\n\n5. Scalability considerations\n\nSave to: docs/analysis/performance-quality.md",
+      "outputFile": "docs/analysis/performance-quality.md",
+      "status": "pending"
+    },
+    {
+      "id": "10-modernization-assessment",
+      "name": "Modernization Assessment",
+      "description": "Assess modernization opportunities",
+      "prompt": "Create modernization assessment based on the technology stack identified:\n\n1. Current technology assessment:\n   - Version currency (how outdated)\n   - EOL/deprecated technologies\n   - Security vulnerabilities\n   - Performance limitations\n\n2. Modernization opportunities:\n   - Language version upgrades\n   - Framework migrations\n   - Architecture improvements\n   - Cloud readiness\n\n3. For the specific stack found, provide recommendations:\n   - If Java EE → Spring Boot migration path\n   - If .NET Framework → .NET Core/.NET 6+ path\n   - If monolith → microservices considerations\n   - If server-rendered → SPA/modern frontend\n\n4. Effort estimation:\n   - High-level phases\n   - Complexity assessment\n   - Risk factors\n\n5. Quick wins vs long-term changes\n\nSave to: docs/modernization/modernization-assessment.md",
+      "outputFile": "docs/modernization/modernization-assessment.md",
+      "status": "pending"
+    },
+    {
+      "id": "11-migration-roadmap",
+      "name": "Detailed Migration Roadmap",
+      "description": "Create specific migration roadmap",
+      "prompt": "Based on the modernization assessment, create a detailed migration roadmap:\n\n1. Target architecture:\n   - Technology choices with rationale\n   - Architecture style\n   - Deployment model\n\n2. Migration phases:\n   Phase 1: Foundation\n   - Environment setup\n   - Tool selection\n   - Pilot component selection\n   \n   Phase 2: Core migration\n   - Data layer migration\n   - Business logic migration\n   - API migration\n   \n   Phase 3: UI modernization\n   - Frontend framework selection\n   - UI component migration\n   - UX improvements\n   \n   Phase 4: Infrastructure\n   - Containerization\n   - CI/CD pipeline\n   - Monitoring/logging\n\n3. For each phase:\n   - Specific tasks\n   - Dependencies\n   - Deliverables\n   - Success criteria\n\n4. Risk mitigation strategies\n\n5. Create migration architecture diagram\n\nSave roadmap to: docs/modernization/migration-roadmap.md\nSave diagram to: docs/diagrams/target-architecture.mmd",
+      "outputFile": "docs/modernization/migration-roadmap.md",
+      "additionalOutputs": ["docs/diagrams/target-architecture.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "12-component-mapping",
+      "name": "Legacy to Modern Component Mapping",
+      "description": "Map legacy components to modern equivalents",
+      "prompt": "Create detailed component mapping from legacy to modern stack:\n\n1. Technology mapping table:\n   - Legacy component/pattern → Modern equivalent\n   - Migration complexity (Low/Medium/High)\n   - Notes and considerations\n\n2. Code pattern transformations:\n   - Legacy patterns → Modern patterns\n   - Anti-pattern remediation\n   - Best practice adoption\n\n3. Specific examples based on stack:\n   - For Java EE → Spring Boot: EJB to Service, etc.\n   - For .NET Framework → .NET Core: Web Forms to MVC/API\n   - For legacy frontend → Modern SPA\n\n4. Data access migration:\n   - ORM changes\n   - Query modernization\n   - Connection management\n\n5. Configuration migration:\n   - From XML to code/annotations\n   - Environment-specific configs\n   - Secrets management\n\nSave to: docs/modernization/component-mapping.md",
+      "outputFile": "docs/modernization/component-mapping.md",
+      "status": "pending"
+    },
+    {
+      "id": "13-validation",
+      "name": "Validate Generated Diagrams",
+      "description": "Check all Mermaid diagrams for syntax errors",
+      "command": "bash scripts/validate-mermaid.sh",
+      "type": "shell",
+      "status": "pending"
+    },
+    {
+      "id": "14-update-claude-md",
+      "name": "Update CLAUDE.md",
+      "description": "Update CLAUDE.md with codebase-specific guidance",
+      "prompt": "Update the CLAUDE.md file with specific guidance for this codebase:\n\n1. Project Overview:\n   - Brief description of what the application does\n   - Technology stack summary\n   - Key business domain\n\n2. Architecture:\n   - High-level architecture description\n   - Main modules/components\n   - Key design patterns used\n\n3. Common Development Commands:\n   - Build commands\n   - Run/test commands\n   - Deployment commands\n   - Database setup (if applicable)\n\n4. Key Patterns and Conventions:\n   - Coding standards observed\n   - Naming conventions\n   - File organization patterns\n   - Important configuration files\n\n5. Important Notes:\n   - Critical business logic locations\n   - Security considerations\n   - Performance hotspots\n   - Known issues or limitations\n\nUpdate the existing CLAUDE.md file, replacing the placeholder sections with actual content based on the codebase analysis.\n\nMake it concise but comprehensive enough to help Claude understand the codebase quickly.",
+      "outputFile": "CLAUDE.md",
+      "status": "pending"
+    },
+    {
+      "id": "15-executive-summary",
+      "name": "Generate Executive Summary",
+      "description": "Create high-level summary for stakeholders",
+      "prompt": "Create an executive summary of the documentation:\n\n1. System Overview:\n   - What the system does\n   - Current technology stack\n   - Architecture style\n   - Size and complexity metrics\n\n2. Key Findings:\n   - Strengths of current system\n   - Major issues identified\n   - Technical debt assessment\n   - Security concerns\n\n3. Modernization Recommendation:\n   - Recommended target stack\n   - Expected benefits\n   - High-level approach\n   - Rough timeline\n   - Investment required (High/Medium/Low)\n\n4. Risks and Mitigation:\n   - Top 5 risks\n   - Mitigation strategies\n\n5. Next Steps:\n   - Immediate actions\n   - Planning requirements\n   - Team requirements\n\nMake it concise (2-3 pages) and suitable for executive readership.\n\nSave to: docs/executive-summary.md",
+      "outputFile": "docs/executive-summary.md",
+      "status": "pending"
+    }
+  ],
+  "config": {
+    "sequential": true,
+    "stopOnError": false,
+    "appDirectory": "app",
+    "docsDirectory": "docs"
+  }
+}

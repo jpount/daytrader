@@ -31,20 +31,20 @@ ehthumbs.db
 Thumbs.db
 
 # Documentation specific
+# Ignore all generated documentation except READMEs
+docs/**/*.md
+!docs/README.md
+docs/**/*.mmd
+docs/**/*.json
+docs/**/*.yaml
 docs/**/*.tmp
 docs/**/*.cache
 docs/**/*.bak
 docs/**/~*
 docs/**/.*.swp
 
-# Keep all markdown and diagram source files
-!docs/**/*.md
-!docs/**/*.mmd
-!docs/diagrams/*.mmd
-
-# Keep generated diagrams for easy viewing
-!docs/diagrams/*.png
-!docs/diagrams/*.svg
+# Documentation database
+.doc-db/
 
 # Temporary build artifacts
 docs/build/
