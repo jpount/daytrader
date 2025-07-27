@@ -150,9 +150,9 @@ check_file "${DOCS_DIR}/architecture/architecture-analysis.md" "Architecture Ana
 check_file "${DOCS_DIR}/api/api-documentation.md" "API Documentation"
 check_file "${DOCS_DIR}/data-models/data-model-analysis.md" "Data Model Analysis"
 check_file "${DOCS_DIR}/business-logic/business-flows.md" "Business Flows"
-check_file "${DOCS_DIR}/modernization/domain-analysis.md" "Domain Analysis"
-check_file "${DOCS_DIR}/modernization/modernization-assessment.md" "Modernization Assessment"
-check_file "${DOCS_DIR}/modernization/migration-roadmap.md" "Migration Roadmap"
+check_file "${DOCS_DIR}/modernisation/domain-analysis.md" "Domain Analysis"
+check_file "${DOCS_DIR}/modernisation/modernisation-assessment.md" "Modernisation Assessment"
+check_file "${DOCS_DIR}/modernisation/migration-roadmap.md" "Migration Roadmap"
 check_file "${DOCS_DIR}/executive-summary.md" "Executive Summary"
 check_file "${PROJECT_ROOT}/CLAUDE.md" "CLAUDE.md"
 

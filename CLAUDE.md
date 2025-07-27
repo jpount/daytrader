@@ -2,105 +2,204 @@
 
 This file provides guidance to Claude Code when working with code in this repository.
 
-## Primary Mission
+## Project Overview
 
-Your primary objective is to analyse the application codebase in the `app/` directory and create comprehensive documentation that enables developers to understand, maintain, and modernise the system.
+**Application Name:** DayTrader 3
+**Business Domain:** Financial Services / Stock Trading
+**Technology Stack:** Java EE 6, EJB 3.1, JPA 2.0, JSF 2.0, WebSphere Liberty
+**Architecture Style:** Modular Monolith (single EAR with multiple modules)
 
-## Documentation Goals
+### Purpose
+DayTrader 3 is a benchmark application that simulates an online stock trading system. Originally developed by IBM for WebSphere Application Server demos, it serves as a comprehensive example of Java EE 6 capabilities. The application allows users to register, login, view stock quotes, buy/sell stocks, and manage their portfolios.
 
-1. **Complete Codebase Understanding**: Analyse every file, function, and module to create a complete picture of the system
-2. **Visual Documentation**: Create Mermaid diagrams for all architectural components, data flows, and relationships
-3. **Business Logic Extraction**: Document all business rules, workflows, and domain logic
-4. **Modernisation Roadmap**: Identify technical debt and provide specific recommendations for modernisation
+### Key Features
+- User registration and authentication
+- Real-time stock quote display
+- Buy/sell order execution (synchronous and asynchronous modes)
+- Portfolio management and account tracking
+- Market summary and trending stocks
+- Performance benchmarking capabilities
 
-## Project Structure
+## Architecture
 
-- **Application Code**: `/app/` - The complete application codebase to be analysed
-- **Documentation Output**: `/docs/` - All generated documentation goes here
-  - `/docs/analysis/` - Initial codebase inventory and analysis
-  - `/docs/architecture/` - System architecture documentation
-  - `/docs/business-logic/` - Business flows and rules
-  - `/docs/data-models/` - Data structures and relationships
-  - `/docs/api/` - API endpoints and interfaces
-  - `/docs/diagrams/` - Mermaid diagram files (.mmd)
-  - `/docs/modernisation/` - Migration recommendations
+### High-Level Architecture
+DayTrader 3 follows a traditional n-tier architecture deployed as a modular monolith. All components run within a single WebSphere Liberty instance, sharing a common Apache Derby database. The application uses both synchronous (direct EJB calls) and asynchronous (JMS) communication patterns.
 
-## Documentation Standards
+### Module Structure
+```
+daytrader3/
+├── daytrader3-ee6-ejb/      # Business logic and data access (EJB/JPA)
+├── daytrader3-ee6-web/      # Web UI layer (Servlets/JSF/JSP)
+├── daytrader3-ee6-rest/     # RESTful services
+├── daytrader3-ee6/          # EAR packaging module
+└── daytrader3-ee6-wlpcfg/   # Liberty server configuration
+```
 
-### For Each Component/Module:
-1. **Purpose**: Clear explanation of what it does
-2. **Dependencies**: What it depends on and what depends on it
-3. **Data Flow**: How data moves through the component
-4. **Business Rules**: Any business logic implemented
-5. **Technical Debt**: Issues, anti-patterns, or modernisation needs
+### Key Components
+| Component | Type | Responsibility | Location |
+|-----------|------|----------------|----------|
+| TradeSLSBBean | Stateless EJB | Core trading operations | com.ibm.websphere.samples.daytrader.ejb3 |
+| TradeDirect | JDBC DAO | Direct database access | com.ibm.websphere.samples.daytrader.direct |
+| TradeAppServlet | Servlet | Main web interface | com.ibm.websphere.samples.daytrader.web |
+| DTBroker3MDB | Message-Driven Bean | Async order processing | com.ibm.websphere.samples.daytrader.ejb3 |
+| AccountDataBean | JPA Entity | User account data | com.ibm.websphere.samples.daytrader |
 
-### Diagram Requirements:
-- Create Mermaid diagrams for:
-  - System architecture overview
-  - Data flow diagrams for each major process
-  - Entity relationship diagrams
-  - Sequence diagrams for key workflows
-  - Component dependency graphs
-- Save all diagrams as .mmd files in `/docs/diagrams/`
-- Include rendered previews in the markdown documentation
+### Design Patterns Used
+- **Service Locator:** TradeAction routes to appropriate service implementation
+- **Data Access Object:** TradeDirect provides direct JDBC access
+- **Session Facade:** TradeSLSBBean encapsulates business logic
+- **Message-Driven:** Asynchronous order processing via JMS
 
-### Analysis Approach:
-1. Start with high-level architecture understanding
-2. Map all data models and relationships
-3. Trace business workflows end-to-end
-4. Document APIs and integration points
-5. Identify patterns and anti-patterns
-6. Create visual representations for everything
+## Common Development Commands
 
-## Key Analysis Areas
+### Building the Application
+```bash
+# Primary build command
+mvn clean install
 
-1. **Technology Stack**: Identify all frameworks, libraries, and tools used
-2. **Architecture Pattern**: Determine if it's MVC, microservices, monolithic, etc.
-3. **Data Layer**: Database schema, ORM usage, data access patterns
-4. **Business Logic Layer**: Core domain logic, business rules, validations
-5. **Presentation Layer**: UI components, templates, client-side logic
-6. **Integration Points**: External services, APIs, message queues
-7. **Security**: Authentication, authorisation, data protection
-8. **Performance**: Bottlenecks, optimisation opportunities
-9. **Testing**: Test coverage, testing strategies
-10. **Deployment**: Build processes, configuration management
+# Build without tests
+mvn clean install -DskipTests
 
-## Output Format
+# Build specific module
+mvn clean install -pl daytrader3-ee6-ejb
+```
 
-### Documentation Files:
-- Use clear, hierarchical markdown structure
-- Include code examples with syntax highlighting
-- Cross-reference related documentation
-- Maintain a consistent format across all files
+### Running the Application
+```bash
+# Start Liberty server
+cd daytrader3-ee6-wlpcfg/servers/daytrader3Sample
+./server run
 
-### File Naming:
-- Use lowercase with hyphens (e.g., `user-authentication-flow.md`)
-- Prefix with numbers for ordering (e.g., `01-overview.md`)
-- Match diagram names to their documentation files
+# Access application
+# URL: http://localhost:9083/daytrader3/
+# Admin URL: http://localhost:9083/daytrader3/config
+```
+
+### Database Operations
+```bash
+# Database is embedded Derby - auto-created on first run
+# To reset database:
+# 1. Stop server
+# 2. Delete: daytrader3-ee6-wlpcfg/servers/daytrader3Sample/shared/data/tradedb
+# 3. Restart server
+# 4. Navigate to: http://localhost:9083/daytrader3/config
+# 5. Click "(Re)-create DayTrader Database Tables and Indexes"
+```
+
+### Testing
+```bash
+# No automated tests exist in the codebase
+# Manual testing via:
+# 1. Performance primitives: http://localhost:9083/daytrader3/TestServlet
+# 2. Scenario testing: http://localhost:9083/daytrader3/scenario
+```
+
+## Key Patterns and Conventions
+
+### Code Organisation
+- **Package Structure:** com.ibm.websphere.samples.daytrader
+- **Subpackages:** direct/ (JDBC), ejb3/ (EJBs), util/, web/, web.jsf/, web.prims/
+- **Entity Naming:** *DataBean suffix for JPA entities
+- **Service Pattern:** TradeServices interface with multiple implementations
+
+### Coding Standards
+- **Language Version:** Java 7 (outdated, no lambdas or streams)
+- **Style Guide:** IBM conventions (verbose, explicit)
+- **Naming:** camelCase methods, PascalCase classes
+- **Comments:** Minimal inline documentation
+
+### Data Access Patterns
+- **Dual Mode:** JPA 2.0 (primary) and direct JDBC (alternative)
+- **Entity Manager:** Container-managed persistence context
+- **Named Queries:** Pre-defined JPQL queries on entities
+- **Transaction Management:** Container-managed (CMT)
+
+### API Conventions
+- **Servlet URLs:** /app (main), /config, /scenario
+- **REST Endpoints:** Limited REST API in separate module
+- **Request Parameters:** Form-based, not JSON
+- **Session State:** Heavy reliance on HttpSession
+
+### Security Patterns
+- **Authentication:** Form-based with plain text passwords (CRITICAL ISSUE)
+- **Authorization:** None implemented
+- **Session Management:** Container-managed HttpSession
+- **No CSRF/XSS Protection:** Major vulnerability
 
 ## Important Notes
 
-- Focus on understanding the "why" not just the "what"
-- Document both the current state and ideal future state
-- Identify quick wins vs long-term modernisation efforts
-- Consider the business impact of technical decisions
-- Make documentation accessible to both technical and non-technical stakeholders
+### Critical Business Logic
+- **Core Trading Logic:** TradeSLSBBean.buy() and sell() methods
+- **Order Processing:** DTBroker3MDB for async order completion
+- **Account Management:** Direct database updates, no proper domain model
+- **Market Summary:** Cached for 15 minutes in MarketSummaryDataBean
 
-## Working Process
+### Performance Considerations
+- **No Distributed Caching:** Only basic time-based market summary cache
+- **N+1 Query Problem:** Portfolio loading fetches each holding separately
+- **Large Classes:** TradeDirect.java has 2,311 lines
+- **Connection Pool:** Min 10, max 70 connections to Derby
 
-1. Use the task management system (tasks.json) to track progress systematically
-2. Start with a complete file inventory and technology assessment
-3. Build documentation incrementally, layer by layer
-4. Create diagrams as you analyse each component
-5. Regularly synthesize findings into higher-level insights
-6. Ensure all documentation is interconnected and searchable
+### Security Considerations
+- **CRITICAL: Plain Text Passwords:** Stored unhashed in database
+- **No HTTPS Enforcement:** Credentials sent in clear text
+- **No Authorization:** Any authenticated user can access any data
+- **SQL Injection Protected:** Uses PreparedStatements consistently
 
-## Specific Instructions for This Repository
+### Configuration
+- **Server Config:** daytrader3-ee6-wlpcfg/servers/daytrader3Sample/server.xml
+- **Data Source:** java:comp/env/jdbc/TradeDataSource
+- **JMS Queue:** jms/TradeBrokerQueue
+- **Port:** 9083 (HTTP), 9443 (HTTPS)
 
-- The application code is located in the `app/` directory
-- All documentation should be generated in the `docs/` directory
-- Use tasks.json for systematic task tracking
-- Reference the CLAUDE.md.template in the config directory for the output format
+### Known Issues and Limitations
+- **0% Test Coverage:** No unit or integration tests
+- **15-20% Code Duplication:** Especially between JDBC and JPA paths
+- **Hard-coded Values:** URLs, timeouts, and config scattered in code
+- **Technology Debt:** Java EE 6 (EOL 2013), Java 7 (EOL 2015)
 
-Remember: The goal is to create documentation so comprehensive that a new developer could understand the entire system and a business analyst could understand all the business logic implemented in code.
+### Development Tips
+- **Reset State:** Delete Derby database directory to start fresh
+- **Debug Mode:** Enable in TradeConfig.setDebug(true)
+- **Performance Testing:** Use primitive servlets in web.prims package
+- **Dual Implementations:** Switch between JPA/JDBC in config page
 
+## Modernisation Context
+
+### Current State Assessment
+- **Technology Currency:** Severely outdated (12+ years behind)
+- **Maintenance Burden:** High - deprecated APIs, security vulnerabilities
+- **Technical Debt Level:** High - no tests, large classes, duplication
+
+### Recommended Migration Path
+- **Target Stack:** Spring Boot 3.x, Java 17 LTS, PostgreSQL, React
+- **Migration Strategy:** Strangler Fig pattern with domain extraction
+- **Architecture:** Microservices with Kubernetes deployment
+- **Timeline:** 14 months with 5-person team
+
+### Priority Areas for Modernisation
+1. **Immediate (Month 1):**
+   - Fix plain text password storage (BCrypt)
+   - Enable HTTPS-only access
+   - Upgrade to Java 17
+
+2. **Short-term (Months 2-6):**
+   - Extract Market Data service (easiest domain)
+   - Implement Spring Security
+   - Add test coverage (target 60%)
+
+3. **Long-term (Months 7-14):**
+   - Full microservices extraction
+   - Replace JSF with React SPA
+   - Implement event-driven architecture
+
+### Domain Boundaries Identified
+1. **User Management:** Authentication, profiles (Easy extraction)
+2. **Market Data:** Quotes, summaries (Easy extraction)
+3. **Trading Operations:** Buy/sell orders (Hard - coupled to portfolio)
+4. **Portfolio Management:** Holdings, balances (Hard - coupled to trading)
+5. **Platform Services:** Config, testing (Remove in modernisation)
+
+---
+
+*Last update: 2025-07-27 - Comprehensive analysis completed for modernisation initiative*

@@ -95,6 +95,16 @@ Your primary objective is to analyse the application codebase in the `app/` dire
 5. Regularly synthesize findings into higher-level insights
 6. Ensure all documentation is interconnected and searchable
 
+## Important Context Retention
+
+**CRITICAL**: See `/config/CONTEXT.md` for important workflow context that must be retained across sessions, including:
+- Validation scripts that MUST run after each task
+- Known issues and workarounds
+- Task completion status
+- Technology stack summary
+
+This file is preserved during clean.sh operations.
+
 ## Specific Instructions for This Repository
 
 - The application code is located in the `app/` directory

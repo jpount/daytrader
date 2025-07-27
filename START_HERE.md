@@ -11,21 +11,39 @@ ls app/  # Should show your codebase files
 
 ### 2. Initialize the documentation structure
 ```bash
+./scripts/clean.sh
 ./scripts/init.sh
 ```
 
 ### 3. Initialize Task Automation (if needed)
-**IMPORTANT: Always run taskmaster commands from the project root directory (/Users/jp/work/ai-messin/daytrader), NOT from the app/ directory**
+**IMPORTANT: Always run taskmaster commands from the project root directory, NOT from the app/ directory**
 
 If taskmaster hasn't been initialized:
 ```bash
 # Make sure you're in the project root, not in app/
-cd /Users/jp/work/ai-messin/daytrader
+cd /path/to/project/root  # Replace with your actual project path
 # Start Claude
 claude
-# Initialise it
+```
+
+Then tell Claude:
+```
 Initialize taskmaster project for claude code - do not create a PRD as there is already a tasks.json file. Copy the file to .taskmaster/tasks/ and generate the individual task files
 ```
+
+**Known Issues & Workarounds:**
+- If TaskMaster reports "Task X not found" when trying to update status, this is a known bug
+- The tasks ARE properly imported and can be viewed with `task-master list`
+- To work around status updates, you can:
+  1. View tasks with `task-master list` and `task-master show <id>`
+  2. Manually track completion in the documentation
+  3. Edit .taskmaster/tasks/tasks.json directly if needed
+
+**Verification Steps:**
+1. Run `task-master list` - you should see all 15 tasks
+2. Run `task-master show 1` - you should see task details
+3. If dependencies show as "Not found", run `task-master validate-dependencies` (but be careful - it may remove all dependencies)
+4. Keep the root tasks.json as backup
 
 ### 4. Use Tasks
 Tell Claude one of these - the **first option** is the suggested approach:
