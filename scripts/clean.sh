@@ -28,8 +28,10 @@ echo "  - viewers/ directory"
 echo "  - System files:"
 echo "    • .gitignore"
 echo "    • .mcp.json"
+echo "    • .env.example"
 echo "    • tasks.json"
 echo "    • README.md"
+echo "    • START_HERE.md"
 echo ""
 
 read -p "Continue? (y/N): " -n 1 -r
@@ -56,9 +58,22 @@ rm -f "${PROJECT_ROOT}/.env.documentation" 2>/dev/null || true
 # Remove CLAUDE.md as it's codebase-specific
 rm -f "${PROJECT_ROOT}/CLAUDE.md" 2>/dev/null || true
 
+# Remove other documentation artifacts from previous runs
+rm -f "${PROJECT_ROOT}/PRD.txt" 2>/dev/null || true
+rm -f "${PROJECT_ROOT}/document-gathering.md" 2>/dev/null || true
+rm -f "${PROJECT_ROOT}/TRADING_BUSINESS_FLOWS.md" 2>/dev/null || true
+
 echo -e "${GREEN}✓ Documentation cleaned${NC}"
 echo ""
-echo "To analyze a new codebase:"
+echo -e "${YELLOW}Note: You may want to manually remove:${NC}"
+echo "  - Any analysis files in the root directory"
+echo "  - Previous task outputs not in docs/"
+echo "  - Old codebase files in app/"
+echo ""
+echo "Next steps:"
 echo "1. Copy your codebase to: ${PROJECT_ROOT}/app"
-echo "2. Run: ./scripts/init.sh"
-echo "3. Use tasks.json with Claude Code"
+echo "2. See START_HERE.md for detailed instructions"
+echo ""
+echo "Quick start:"
+echo "  ./scripts/init.sh"
+echo "  Then tell Claude: 'Please run the documentation tasks in tasks.json'"

@@ -1,7 +1,7 @@
 {
-  "name": "Universal Codebase Documentation System",
-  "description": "Comprehensive documentation generator for any codebase with modernization recommendations",
-  "version": "2.0",
+  "name": "Universal Codebase Documentation System - Complete Edition",
+  "description": "Comprehensive documentation generator with domain extraction, strangler fig analysis, and validation",
+  "version": "4.0",
   "tasks": [
     {
       "id": "01-init",
@@ -31,7 +31,7 @@
       "id": "04-architecture-analysis",
       "name": "Architecture Analysis",
       "description": "Document system architecture and patterns",
-      "prompt": "Analyze and document the system architecture:\n\n1. Identify architectural style:\n   - Monolithic, microservices, modular\n   - Layered, hexagonal, event-driven\n   - Client-server, n-tier\n\n2. Document layers/tiers:\n   - Presentation layer components\n   - Business logic layer\n   - Data access layer\n   - Integration layer\n\n3. Identify design patterns:\n   - Creational patterns\n   - Structural patterns\n   - Behavioral patterns\n   - Architecture patterns\n\n4. Dependencies and coupling:\n   - Inter-module dependencies\n   - External dependencies\n   - Coupling analysis\n\n5. Create architecture diagram showing:\n   - Major components\n   - Data flow\n   - Integration points\n\nSave documentation to: docs/architecture/architecture-analysis.md\nSave diagram to: docs/diagrams/system-architecture.mmd",
+      "prompt": "Analyze and document the system architecture:\n\n1. Identify architectural style:\n   - Monolithic, microservices, modular\n   - Layered, hexagonal, event-driven\n   - Client-server, n-tier\n\n2. Document layers/tiers:\n   - Presentation layer components\n   - Business logic layer\n   - Data access layer\n   - Integration layer\n\n3. Identify design patterns:\n   - Creational patterns\n   - Structural patterns\n   - Behavioral patterns\n   - Architecture patterns\n\n4. Dependencies and coupling:\n   - Inter-module dependencies\n   - External dependencies\n   - Coupling analysis\n\n5. Create architecture diagram showing:\n   - Major components\n   - Data flow\n   - Integration points\n\n6. VALIDATION STEPS:\n   - Verify diagram syntax is valid Mermaid\n   - Ensure all components in analysis appear in diagram\n   - Add proper labels and descriptions\n   - Test render with: mmdc -i docs/diagrams/system-architecture.mmd -o /tmp/test.png\n   - Update references in architecture-analysis.md\n\nSave documentation to: docs/architecture/architecture-analysis.md\nSave diagram to: docs/diagrams/system-architecture.mmd",
       "outputFile": "docs/architecture/architecture-analysis.md",
       "additionalOutputs": ["docs/diagrams/system-architecture.mmd"],
       "status": "pending"
@@ -48,22 +48,31 @@
       "id": "06-data-model",
       "name": "Data Model Analysis",
       "description": "Document data structures and persistence",
-      "prompt": "Analyze and document the data model:\n\n1. Identify data storage:\n   - Database type and version\n   - ORM/Data access technology\n   - File-based storage\n   - Cache systems\n\n2. Document entities/tables:\n   - Name and purpose\n   - Fields/columns with types\n   - Primary keys\n   - Indexes\n   - Constraints\n\n3. Relationships:\n   - Foreign keys\n   - Association types (1:1, 1:N, M:N)\n   - Cascade rules\n\n4. Data access patterns:\n   - Repository/DAO methods\n   - Query patterns\n   - Transaction boundaries\n\n5. Create ER diagram\n\nSave documentation to: docs/data-models/data-model-analysis.md\nSave ER diagram to: docs/diagrams/er-diagram.mmd",
+      "prompt": "Analyze and document the data model:\n\n1. Identify data storage:\n   - Database type and version\n   - ORM/Data access technology\n   - File-based storage\n   - Cache systems\n\n2. Document entities/tables:\n   - Name and purpose\n   - Fields/columns with types\n   - Primary keys\n   - Indexes\n   - Constraints\n\n3. Relationships:\n   - Foreign keys\n   - Association types (1:1, 1:N, M:N)\n   - Cascade rules\n\n4. Data access patterns:\n   - Repository/DAO methods\n   - Query patterns\n   - Transaction boundaries\n\n5. Create ER diagram\n\n6. VALIDATION: After creating the ER diagram:\n   - Verify Mermaid syntax is correct\n   - Include all entities from the analysis\n   - Show relationships with proper cardinality\n   - Add clear labels and descriptions\n   - Reference the diagram in data-model-analysis.md\n\nSave documentation to: docs/data-models/data-model-analysis.md\nSave ER diagram to: docs/diagrams/er-diagram.mmd",
       "outputFile": "docs/data-models/data-model-analysis.md",
       "additionalOutputs": ["docs/diagrams/er-diagram.mmd"],
       "status": "pending"
     },
     {
-      "id": "07-business-logic",
+      "id": "07-domain-boundaries",
+      "name": "Domain Boundaries and Strangler Fig Analysis",
+      "description": "Identify domains for strangler fig extraction",
+      "prompt": "Identify domain boundaries for strangler fig pattern implementation:\n\n1. Domain Discovery:\n   - Analyze package/namespace organization for natural boundaries\n   - Identify clusters of related database tables\n   - Group related API endpoints\n   - Find cohesive business capabilities\n   - Look for team ownership patterns\n\n2. For Each Domain Found:\n   - Name and core business purpose\n   - Key entities and aggregates\n   - Primary operations/use cases\n   - Database tables used\n   - API endpoints\n   - Dependencies on other domains\n\n3. Coupling Assessment:\n   - Rate coupling level (High/Medium/Low)\n   - Identify database joins across domains\n   - Find shared transactions\n   - Locate tight code dependencies\n\n4. Extraction Difficulty:\n   Rate each domain as Easy/Medium/Hard based on:\n   - Isolation level\n   - Data entanglement  \n   - UI complexity\n   - Business criticality\n\n5. Recommended Extraction Order:\n   - Start with least coupled domains\n   - Prioritize high business value\n   - Consider team readiness\n   - Identify quick wins\n\n6. For Each Domain - Extraction Strategy:\n   - Extraction pattern (API Gateway, Event Interception, Database View, etc.)\n   - Data synchronization approach\n   - API facade design\n   - Gradual migration steps\n   - Rollback strategy\n\n7. Anti-Corruption Layer Design:\n   - Interface definitions between legacy and new\n   - Data transformation requirements\n   - Event translation needs\n   - Temporary dual-write strategies\n\n8. Create domain diagrams:\n   - Domain boundary diagram\n   - Domain dependency graph\n   - Extraction sequence timeline\n\n9. VALIDATION: After creating diagrams:\n   - Verify all Mermaid syntax is correct\n   - Show clear domain boundaries\n   - Include dependencies between domains\n   - Reference all diagrams in the documentation\n\nSave to: docs/modernization/domain-analysis.md\nDiagrams to: docs/diagrams/domain-boundaries.mmd, docs/diagrams/domain-dependencies.mmd, docs/diagrams/extraction-sequence.mmd",
+      "outputFile": "docs/modernization/domain-analysis.md", 
+      "additionalOutputs": ["docs/diagrams/domain-boundaries.mmd", "docs/diagrams/domain-dependencies.mmd", "docs/diagrams/extraction-sequence.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "08-business-logic",
       "name": "Business Logic and Flow Analysis",
       "description": "Extract business rules and process flows",
-      "prompt": "Extract and document business logic:\n\n1. Identify major business processes:\n   - User workflows\n   - System processes\n   - Batch operations\n   - Scheduled tasks\n\n2. For each major flow:\n   - Entry point\n   - Step-by-step process\n   - Decision points\n   - Data transformations\n   - External calls\n   - Error handling\n\n3. Business rules:\n   - Validation rules\n   - Calculation logic\n   - Business constraints\n   - Authorization rules\n\n4. State management:\n   - State machines\n   - Status transitions\n   - Lifecycle management\n\n5. Create sequence diagrams for major flows\n\nSave documentation to: docs/business-logic/business-flows.md\nSave diagrams to: docs/diagrams/business-flows.mmd",
+      "prompt": "Extract and document business logic:\n\n1. Identify major business processes:\n   - User workflows\n   - System processes\n   - Batch operations\n   - Scheduled tasks\n\n2. For each major flow:\n   - Entry point\n   - Step-by-step process\n   - Decision points\n   - Data transformations\n   - External calls\n   - Error handling\n\n3. Business rules:\n   - Validation rules\n   - Calculation logic\n   - Business constraints\n   - Authorization rules\n\n4. State management:\n   - State machines\n   - Status transitions\n   - Lifecycle management\n\n5. Create sequence diagrams for major flows\n\n6. VALIDATION: After creating diagrams:\n   - Validate all Mermaid syntax\n   - Include key business processes\n   - Show clear flow with decision points\n   - Reference all diagrams in the documentation\n\nSave documentation to: docs/business-logic/business-flows.md\nSave diagrams to: docs/diagrams/business-flows.mmd",
       "outputFile": "docs/business-logic/business-flows.md",
       "additionalOutputs": ["docs/diagrams/business-flows.mmd"],
       "status": "pending"
     },
     {
-      "id": "08-security-analysis",
+      "id": "09-security-analysis",
       "name": "Security and Authentication Analysis",
       "description": "Document security implementation",
       "prompt": "Analyze security implementation:\n\n1. Authentication:\n   - Authentication method (forms, JWT, OAuth, etc.)\n   - User storage\n   - Password policies\n   - Session management\n\n2. Authorization:\n   - Role-based access\n   - Permission systems\n   - Resource protection\n\n3. Security measures:\n   - Input validation\n   - SQL injection prevention\n   - XSS protection\n   - CSRF protection\n\n4. Sensitive data:\n   - Encryption usage\n   - Secure storage\n   - Data masking\n\n5. Security vulnerabilities:\n   - Identified issues\n   - Recommendations\n\nSave to: docs/analysis/security-analysis.md",
@@ -71,7 +80,7 @@
       "status": "pending"
     },
     {
-      "id": "09-performance-quality",
+      "id": "10-performance-quality",
       "name": "Performance and Code Quality Analysis",
       "description": "Analyze performance characteristics and code quality",
       "prompt": "Analyze performance and code quality:\n\n1. Performance characteristics:\n   - Caching strategies\n   - Database query patterns\n   - Async operations\n   - Resource pooling\n   - Load handling\n\n2. Code quality indicators:\n   - Code duplication\n   - Complexity hotspots\n   - Long methods/classes\n   - Coupling issues\n\n3. Technical debt:\n   - Deprecated usage\n   - Anti-patterns\n   - Missing abstractions\n   - Hard-coded values\n\n4. Testing:\n   - Test coverage\n   - Test types present\n   - Testing patterns\n\n5. Scalability considerations\n\nSave to: docs/analysis/performance-quality.md",
@@ -79,7 +88,7 @@
       "status": "pending"
     },
     {
-      "id": "10-modernization-assessment",
+      "id": "11-modernization-assessment",
       "name": "Modernization Assessment",
       "description": "Assess modernization opportunities",
       "prompt": "Create modernization assessment based on the technology stack identified:\n\n1. Current technology assessment:\n   - Version currency (how outdated)\n   - EOL/deprecated technologies\n   - Security vulnerabilities\n   - Performance limitations\n\n2. Modernization opportunities:\n   - Language version upgrades\n   - Framework migrations\n   - Architecture improvements\n   - Cloud readiness\n\n3. For the specific stack found, provide recommendations:\n   - If Java EE → Spring Boot migration path\n   - If .NET Framework → .NET Core/.NET 6+ path\n   - If monolith → microservices considerations\n   - If server-rendered → SPA/modern frontend\n\n4. Effort estimation:\n   - High-level phases\n   - Complexity assessment\n   - Risk factors\n\n5. Quick wins vs long-term changes\n\nSave to: docs/modernization/modernization-assessment.md",
@@ -87,16 +96,16 @@
       "status": "pending"
     },
     {
-      "id": "11-migration-roadmap",
+      "id": "12-migration-roadmap",
       "name": "Detailed Migration Roadmap",
       "description": "Create specific migration roadmap",
-      "prompt": "Based on the modernization assessment, create a detailed migration roadmap:\n\n1. Target architecture:\n   - Technology choices with rationale\n   - Architecture style\n   - Deployment model\n\n2. Migration phases:\n   Phase 1: Foundation\n   - Environment setup\n   - Tool selection\n   - Pilot component selection\n   \n   Phase 2: Core migration\n   - Data layer migration\n   - Business logic migration\n   - API migration\n   \n   Phase 3: UI modernization\n   - Frontend framework selection\n   - UI component migration\n   - UX improvements\n   \n   Phase 4: Infrastructure\n   - Containerization\n   - CI/CD pipeline\n   - Monitoring/logging\n\n3. For each phase:\n   - Specific tasks\n   - Dependencies\n   - Deliverables\n   - Success criteria\n\n4. Risk mitigation strategies\n\n5. Create migration architecture diagram\n\nSave roadmap to: docs/modernization/migration-roadmap.md\nSave diagram to: docs/diagrams/target-architecture.mmd",
+      "prompt": "Based on the modernization assessment, create a detailed migration roadmap:\n\n1. Target architecture:\n   - Technology choices with rationale\n   - Architecture style\n   - Deployment model\n\n2. Migration phases:\n   Phase 1: Foundation\n   - Environment setup\n   - Tool selection\n   - Pilot component selection\n   \n   Phase 2: Core migration\n   - Data layer migration\n   - Business logic migration\n   - API migration\n   \n   Phase 3: UI modernization\n   - Frontend framework selection\n   - UI component migration\n   - UX improvements\n   \n   Phase 4: Infrastructure\n   - Containerization\n   - CI/CD pipeline\n   - Monitoring/logging\n\n3. For each phase:\n   - Specific tasks\n   - Dependencies\n   - Deliverables\n   - Success criteria\n\n4. Risk mitigation strategies\n\n5. Create migration architecture diagram\n\n6. VALIDATION: After creating the diagram:\n   - Validate Mermaid syntax is correct\n   - Show clear migration phases\n   - Include both current and target state\n   - Reference the diagram in the roadmap document\n\nSave roadmap to: docs/modernization/migration-roadmap.md\nSave diagram to: docs/diagrams/target-architecture.mmd",
       "outputFile": "docs/modernization/migration-roadmap.md",
       "additionalOutputs": ["docs/diagrams/target-architecture.mmd"],
       "status": "pending"
     },
     {
-      "id": "12-component-mapping",
+      "id": "13-component-mapping",
       "name": "Legacy to Modern Component Mapping",
       "description": "Map legacy components to modern equivalents",
       "prompt": "Create detailed component mapping from legacy to modern stack:\n\n1. Technology mapping table:\n   - Legacy component/pattern → Modern equivalent\n   - Migration complexity (Low/Medium/High)\n   - Notes and considerations\n\n2. Code pattern transformations:\n   - Legacy patterns → Modern patterns\n   - Anti-pattern remediation\n   - Best practice adoption\n\n3. Specific examples based on stack:\n   - For Java EE → Spring Boot: EJB to Service, etc.\n   - For .NET Framework → .NET Core: Web Forms to MVC/API\n   - For legacy frontend → Modern SPA\n\n4. Data access migration:\n   - ORM changes\n   - Query modernization\n   - Connection management\n\n5. Configuration migration:\n   - From XML to code/annotations\n   - Environment-specific configs\n   - Secrets management\n\nSave to: docs/modernization/component-mapping.md",
@@ -104,26 +113,28 @@
       "status": "pending"
     },
     {
-      "id": "13-validation",
-      "name": "Validate Generated Diagrams",
-      "description": "Check all Mermaid diagrams for syntax errors",
-      "command": "bash scripts/validate-mermaid.sh",
+      "id": "14-validation",
+      "name": "Comprehensive Documentation Validation",
+      "description": "Validate all documentation and diagrams",
+      "prompt": "Perform comprehensive validation:\n\n1. Run diagram validation:\n   - Execute: bash scripts/validate-mermaid.sh\n   - Review any syntax errors reported\n   - Fix invalid diagrams\n\n2. Check documentation completeness:\n   - Verify all expected files exist\n   - Search for placeholder text: [To be filled], TODO, PLACEHOLDER\n   - Ensure all sections have real content\n\n3. Validate cross-references:\n   - Check all .md file links work\n   - Verify diagram references are correct\n   - Ensure no broken links\n\n4. Check diagram usage:\n   - Confirm all .mmd files are referenced in documentation\n   - Update any missing references\n\n5. Run comprehensive validation:\n   - Execute: bash scripts/validate-all.sh\n   - Review the validation report\n   - Fix any critical issues\n\n6. Final checks:\n   - CLAUDE.md is complete with project-specific info\n   - Executive summary is clear and concise\n   - All modernization recommendations are actionable\n   - Domain extraction plan is comprehensive\n   - Strangler fig strategies are practical\n\nReport validation results and confirm all issues are resolved.",
+      "outputFile": "docs/validation/validation-summary.md",
+      "command": "bash scripts/validate-all.sh",
       "type": "shell",
       "status": "pending"
     },
     {
-      "id": "14-update-claude-md",
+      "id": "15-update-claude-md",
       "name": "Update CLAUDE.md",
       "description": "Update CLAUDE.md with codebase-specific guidance",
-      "prompt": "Update the CLAUDE.md file with specific guidance for this codebase:\n\n1. Project Overview:\n   - Brief description of what the application does\n   - Technology stack summary\n   - Key business domain\n\n2. Architecture:\n   - High-level architecture description\n   - Main modules/components\n   - Key design patterns used\n\n3. Common Development Commands:\n   - Build commands\n   - Run/test commands\n   - Deployment commands\n   - Database setup (if applicable)\n\n4. Key Patterns and Conventions:\n   - Coding standards observed\n   - Naming conventions\n   - File organization patterns\n   - Important configuration files\n\n5. Important Notes:\n   - Critical business logic locations\n   - Security considerations\n   - Performance hotspots\n   - Known issues or limitations\n\nUpdate the existing CLAUDE.md file, replacing the placeholder sections with actual content based on the codebase analysis.\n\nMake it concise but comprehensive enough to help Claude understand the codebase quickly.",
+      "prompt": "Update the CLAUDE.md file with specific guidance for this codebase:\n\n1. Use the comprehensive template if available (CLAUDE.md.template)\n\n2. Project Overview:\n   - Brief description of what the application does\n   - Technology stack summary\n   - Key business domain\n   - Architecture style\n\n3. Architecture:\n   - High-level architecture description\n   - Main modules/components\n   - Key design patterns used\n   - Domain boundaries identified\n\n4. Common Development Commands:\n   - Build commands\n   - Run/test commands\n   - Deployment commands\n   - Database setup (if applicable)\n\n5. Key Patterns and Conventions:\n   - Coding standards observed\n   - Naming conventions\n   - File organization patterns\n   - Important configuration files\n\n6. Important Notes:\n   - Critical business logic locations\n   - Security considerations\n   - Performance hotspots\n   - Known issues or limitations\n\n7. Modernization Context:\n   - Current state assessment\n   - Recommended migration path\n   - Key domains for extraction\n   - Priority areas for modernization\n\nUpdate the existing CLAUDE.md file, replacing the placeholder sections with actual content based on the codebase analysis.\n\nMake it concise but comprehensive enough to help Claude understand the codebase quickly.",
       "outputFile": "CLAUDE.md",
       "status": "pending"
     },
     {
-      "id": "15-executive-summary",
+      "id": "16-executive-summary",
       "name": "Generate Executive Summary",
       "description": "Create high-level summary for stakeholders",
-      "prompt": "Create an executive summary of the documentation:\n\n1. System Overview:\n   - What the system does\n   - Current technology stack\n   - Architecture style\n   - Size and complexity metrics\n\n2. Key Findings:\n   - Strengths of current system\n   - Major issues identified\n   - Technical debt assessment\n   - Security concerns\n\n3. Modernization Recommendation:\n   - Recommended target stack\n   - Expected benefits\n   - High-level approach\n   - Rough timeline\n   - Investment required (High/Medium/Low)\n\n4. Risks and Mitigation:\n   - Top 5 risks\n   - Mitigation strategies\n\n5. Next Steps:\n   - Immediate actions\n   - Planning requirements\n   - Team requirements\n\nMake it concise (2-3 pages) and suitable for executive readership.\n\nSave to: docs/executive-summary.md",
+      "prompt": "Create an executive summary of the documentation:\n\n1. System Overview:\n   - What the system does\n   - Current technology stack\n   - Architecture style\n   - Size and complexity metrics\n\n2. Key Findings:\n   - Strengths of current system\n   - Major issues identified\n   - Technical debt assessment\n   - Security concerns\n\n3. Domain Analysis Summary:\n   - Key domains identified\n   - Extraction complexity\n   - Recommended extraction sequence\n\n4. Modernization Recommendation:\n   - Recommended target stack\n   - Expected benefits\n   - High-level approach\n   - Rough timeline\n   - Investment required (High/Medium/Low)\n\n5. Strangler Fig Migration Strategy:\n   - Phase 1: Quick wins (which domains)\n   - Phase 2: Core domains\n   - Phase 3: Complex domains\n   - Anti-corruption approach\n\n6. Risks and Mitigation:\n   - Top 5 risks\n   - Mitigation strategies\n\n7. Next Steps:\n   - Immediate actions\n   - Planning requirements\n   - Team requirements\n\nMake it concise (2-3 pages) and suitable for executive readership.\n\nSave to: docs/executive-summary.md",
       "outputFile": "docs/executive-summary.md",
       "status": "pending"
     }

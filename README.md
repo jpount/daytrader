@@ -8,7 +8,7 @@ The system is designed to:
 - Analyze any codebase (Java, .NET, or other technologies)
 - Generate detailed technical documentation
 - Identify architectural patterns and components
-- Provide modernization recommendations
+- Provide modernisation recommendations
 - Create visual diagrams in Mermaid format
 
 ## Repository Structure
@@ -28,7 +28,7 @@ The system is designed to:
 
 ### 1. Setup Claude
 
-Setup MCPs:
+Setup MCPs and ENVs:
 ```bash
 # Create local .claude directory
 mkdir .claude
@@ -36,6 +36,9 @@ cp config/settings.local.json .claude/
 # Create local MCP confirm
 cp config/.mcp.json.example ./.mcp.json
 # Update the new file with any token/api keys
+# Create local Env file
+cp config/.env.example ./.env
+# Update the new file with any env values
 ```
 
 ### 2. Setup
@@ -57,9 +60,24 @@ This creates the documentation directory structure.
 ### 4. Run Documentation Generation
 
 Use Claude Code with the provided `tasks.json`:
-1. Open Claude Code
-2. Use the task automation feature with `tasks.json`
+
+#### Option A: Let Claude Initialize Taskmaster
+1. Open Claude Code in this directory
+2. Tell Claude: "Initialize taskmaster and run the documentation tasks"
+3. Claude will set up taskmaster and begin the analysis
+
+#### Option B: Manual Taskmaster Setup
+1. Initialize taskmaster:
+   ```bash
+   mkdir -p .taskmaster
+   cp tasks.json .taskmaster/
+   ```
+2. Tell Claude: "Run the documentation tasks using taskmaster"
 3. The system will analyze your codebase and generate documentation
+
+#### Option C: Direct Task Execution
+1. Tell Claude: "Please run task 01-init from tasks.json"
+2. Continue with subsequent tasks as Claude completes them
 
 ### 5. Clean and Restart (Optional)
 
@@ -77,7 +95,7 @@ cp -r /path/to/new/codebase/* app/
 
 ## Documentation Structure
 
-Generated documentation will be organized as follows:
+Generated documentation will be organised as follows:
 
 ```
 docs/
@@ -87,7 +105,7 @@ docs/
 ├── data-models/       # Data structures and relationships
 ├── api/               # API documentation
 ├── diagrams/          # Visual diagrams (.mmd files)
-├── modernization/     # Migration recommendations
+├── modernisation/     # Migration recommendations
 └── executive-summary.md
 ```
 
@@ -107,7 +125,7 @@ docs/
 - Security assessment
 - Performance analysis
 
-### Modernization Focus
+### Modernisation Focus
 - Identifies outdated technologies
 - Provides specific migration paths:
   - Java EE → Spring Boot + Angular

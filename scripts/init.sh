@@ -27,7 +27,7 @@ mkdir -p "${DOCS_DIR}/business-logic"
 mkdir -p "${DOCS_DIR}/data-models"
 mkdir -p "${DOCS_DIR}/api"
 mkdir -p "${DOCS_DIR}/diagrams"
-mkdir -p "${DOCS_DIR}/modernization"
+mkdir -p "${DOCS_DIR}/modernisation"
 
 echo -e "${GREEN}✓ Directory structure created${NC}"
 
@@ -57,7 +57,7 @@ This directory contains comprehensive documentation generated from the codebase 
 - `data-models/` - Data structures and relationships
 - `api/` - API endpoints and interfaces
 - `diagrams/` - Visual representations (Mermaid .mmd files)
-- `modernization/` - Migration and modernization recommendations
+- `modernisation/` - Migration and modernisation recommendations
 
 ## Generation
 

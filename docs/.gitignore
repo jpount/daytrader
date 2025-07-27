@@ -1,15 +1,8 @@
 # Temporary files
 *.tmp
 *.swp
-*.bak
+*~
 
-# Generated files
-*.generated.md
-
-# Database files
-*.db-journal
-*.db-wal
-
-# IDE files
-.idea/
-.vscode/
+# OS files
+.DS_Store
+Thumbs.db

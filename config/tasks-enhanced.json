@@ -1,0 +1,209 @@
+{
+  "name": "Universal Codebase Documentation System",
+  "description": "Comprehensive documentation generator for any codebase with modernization recommendations",
+  "version": "3.0",
+  "config": {
+    "sequential": true,
+    "stopOnError": false,
+    "appDirectory": "app",
+    "docsDirectory": "docs",
+    "diagramFormat": "mmd",
+    "enableDatabase": false,
+    "customPatterns": {
+      "ignorePatterns": ["**/node_modules/**", "**/bin/**", "**/obj/**", "**/target/**"],
+      "binaryExtensions": [".jar", ".dll", ".exe", ".class", ".pyc"],
+      "testPatterns": ["**/test/**", "**/tests/**", "**/*Test.*", "**/*Spec.*"]
+    }
+  },
+  "tasks": [
+    {
+      "id": "00-pre-check",
+      "name": "Pre-flight Check",
+      "description": "Verify codebase exists and is accessible",
+      "prompt": "Check if the /app directory exists and contains code. If not, provide clear instructions on what the user needs to do. List the top-level contents of /app if it exists.",
+      "outputFile": "docs/analysis/pre-check.md",
+      "status": "pending"
+    },
+    {
+      "id": "01-init",
+      "name": "Initialize Documentation Structure",
+      "description": "Create documentation directories",
+      "command": "bash scripts/init.sh",
+      "type": "shell",
+      "status": "pending"
+    },
+    {
+      "id": "02-codebase-analysis",
+      "name": "Codebase Analysis and Technology Detection",
+      "description": "Identify technology stack and project structure",
+      "prompt": "Analyze the codebase in the /app directory:\n\n1. Technology Detection:\n   - Primary language(s) with versions\n   - Frameworks (web, testing, ORM, etc.)\n   - Build tools and package managers\n   - Runtime environments\n   - Database technologies\n   - Frontend technologies\n   - DevOps tools (Docker, K8s configs)\n\n2. Project Structure:\n   - Architecture style (monolith, microservices, modular)\n   - Module/project organization\n   - Source code layout\n   - Test structure\n   - Configuration structure\n\n3. Dependencies:\n   - Direct dependencies (count and major ones)\n   - Development dependencies\n   - Dependency management files\n   - Version constraints\n\n4. Codebase Metrics:\n   - Lines of code by language\n   - File count by type\n   - Test coverage indicators\n   - Comment density\n   - Module count\n\n5. Development Patterns:\n   - Git workflow (branch structure)\n   - CI/CD indicators\n   - Documentation presence\n   - Code quality tools\n\n6. Special Characteristics:\n   - Multi-language project?\n   - Monorepo indicators?\n   - Generated code?\n   - Legacy markers?\n\nCreate a comprehensive technology profile and identify the primary analysis path for subsequent tasks.\n\nSave comprehensive analysis to: docs/analysis/codebase-overview.md",
+      "outputFile": "docs/analysis/codebase-overview.md",
+      "status": "pending"
+    },
+    {
+      "id": "03-deep-structure-analysis",
+      "name": "Deep Structure and Dependency Analysis",
+      "description": "Analyze code structure and dependencies in detail",
+      "prompt": "Perform deep structural analysis:\n\n1. Dependency Graph:\n   - Internal module dependencies\n   - Circular dependencies\n   - Dependency depth\n   - Cohesion analysis\n\n2. Namespace/Package Analysis:\n   - Organization principles\n   - Naming conventions\n   - Package responsibilities\n   - Cross-cutting concerns\n\n3. File Organization:\n   - File types and purposes\n   - Naming patterns\n   - Directory structure meaning\n   - Configuration vs code\n\n4. Code Metrics:\n   - Complexity hotspots\n   - Large files/classes\n   - Duplication indicators\n   - Dead code indicators\n\n5. Build Configuration:\n   - Build phases\n   - Custom tasks\n   - Environment-specific builds\n   - Artifact generation\n\n6. Create visual dependency diagram\n\nSave to: docs/analysis/structure-analysis.md\nDiagram to: docs/diagrams/dependency-graph.mmd",
+      "outputFile": "docs/analysis/structure-analysis.md",
+      "additionalOutputs": ["docs/diagrams/dependency-graph.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "04-component-inventory",
+      "name": "Comprehensive Component Inventory",
+      "description": "Create detailed inventory of all components",
+      "prompt": "Create an exhaustive component inventory:\n\n1. Component Discovery by Type:\n   - Controllers/Endpoints\n   - Services/Business Logic\n   - Data Access/Repositories\n   - Models/Entities/DTOs\n   - Utilities/Helpers\n   - Middleware/Filters\n   - Configuration classes\n   - Factory/Builder classes\n   - Event handlers\n   - Background jobs\n\n2. For Each Component:\n   - Full qualified name\n   - File location\n   - Type and stereotype\n   - Responsibilities\n   - Dependencies (uses)\n   - Dependents (used by)\n   - Annotations/Attributes\n   - Interface implementations\n   - Public API surface\n\n3. Cross-Cutting Concerns:\n   - Logging components\n   - Security components\n   - Caching components\n   - Validation components\n   - Error handling\n\n4. External Integration Points:\n   - HTTP clients\n   - Message queue clients\n   - Database clients\n   - File system access\n   - External service calls\n\n5. Component Statistics:\n   - Components by type\n   - Complexity distribution\n   - Coupling metrics\n   - Component size metrics\n\n6. Entry Points:\n   - Application starters\n   - API endpoints\n   - Event listeners\n   - Scheduled tasks\n   - CLI commands\n\nCreate searchable component catalog.\n\nSave to: docs/analysis/component-inventory.md",
+      "outputFile": "docs/analysis/component-inventory.md",
+      "status": "pending"
+    },
+    {
+      "id": "05-architecture-patterns",
+      "name": "Architecture and Design Pattern Analysis",
+      "description": "Identify architectural patterns and design decisions",
+      "prompt": "Analyze architecture and design patterns:\n\n1. Architectural Style:\n   - Overall architecture (layered, hexagonal, microservices, etc.)\n   - Architectural decisions\n   - Trade-offs made\n   - Consistency of implementation\n\n2. Design Patterns Detected:\n   - Creational patterns (Factory, Builder, Singleton, etc.)\n   - Structural patterns (Adapter, Facade, Proxy, etc.)\n   - Behavioral patterns (Observer, Strategy, Command, etc.)\n   - Domain patterns (Repository, Specification, etc.)\n   - Enterprise patterns (DTO, DAO, MVC, etc.)\n\n3. Architectural Components:\n   - Presentation layer details\n   - Business logic organization\n   - Data access patterns\n   - Integration layer\n   - Cross-cutting concerns\n\n4. Communication Patterns:\n   - Synchronous calls\n   - Asynchronous messaging\n   - Event-driven components\n   - Batch processing\n\n5. Data Flow:\n   - Request flow\n   - Data transformation points\n   - Validation points\n   - Transaction boundaries\n\n6. Quality Attributes:\n   - Scalability provisions\n   - Security implementation\n   - Performance optimizations\n   - Maintainability features\n\n7. Create comprehensive architecture diagrams\n\nSave to: docs/architecture/architecture-analysis.md\nDiagrams to: docs/diagrams/architecture-*.mmd",
+      "outputFile": "docs/architecture/architecture-analysis.md",
+      "additionalOutputs": ["docs/diagrams/architecture-overview.mmd", "docs/diagrams/architecture-layers.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "06-api-contracts",
+      "name": "API and Contract Documentation",
+      "description": "Document all APIs, interfaces, and contracts",
+      "prompt": "Document all APIs and contracts:\n\n1. External APIs:\n   - REST endpoints (paths, methods, payloads)\n   - GraphQL schema\n   - SOAP services\n   - gRPC services\n   - WebSocket endpoints\n   - Webhook endpoints\n\n2. For Each Endpoint:\n   - Full path/address\n   - HTTP method/operation\n   - Request structure (headers, params, body)\n   - Response structure (success and errors)\n   - Authentication/authorization\n   - Rate limiting\n   - Validation rules\n   - Example requests/responses\n\n3. Internal Interfaces:\n   - Service interfaces\n   - Repository contracts\n   - Event contracts\n   - Message formats\n   - Plugin interfaces\n\n4. Data Contracts:\n   - DTOs and their mappings\n   - Serialization formats\n   - Versioning strategy\n   - Backward compatibility\n\n5. Integration Contracts:\n   - External service interfaces\n   - File formats\n   - Database schemas\n   - Message queue formats\n\n6. API Evolution:\n   - Versioning approach\n   - Deprecation strategy\n   - Breaking changes\n\n7. Generate OpenAPI/Swagger if applicable\n\nSave to: docs/api/api-documentation.md\nContracts to: docs/api/contracts/",
+      "outputFile": "docs/api/api-documentation.md",
+      "additionalOutputs": ["docs/api/contracts/"],
+      "status": "pending"
+    },
+    {
+      "id": "07-data-architecture",
+      "name": "Data Architecture and Model Analysis",
+      "description": "Comprehensive data layer documentation",
+      "prompt": "Analyze complete data architecture:\n\n1. Data Storage Systems:\n   - Primary database (type, version)\n   - Secondary stores (cache, search, etc.)\n   - File storage\n   - Configuration stores\n   - Message queues\n\n2. Data Models:\n   - Entities/Tables (complete inventory)\n   - Fields with types and constraints\n   - Keys (primary, foreign, unique)\n   - Indexes and performance\n   - Triggers and procedures\n   - Views and materialized views\n\n3. Relationships:\n   - Entity relationships (1:1, 1:N, M:N)\n   - Cascade rules\n   - Orphan handling\n   - Referential integrity\n\n4. Data Access Layer:\n   - ORM configuration\n   - Query patterns\n   - Connection management\n   - Transaction patterns\n   - Caching strategy\n   - Query optimization\n\n5. Data Flows:\n   - CRUD operations\n   - Bulk operations\n   - ETL processes\n   - Data synchronization\n   - Archival processes\n\n6. Data Quality:\n   - Validation rules\n   - Data integrity checks\n   - Audit trails\n   - Historical data\n\n7. Create comprehensive ER diagram\n8. Create data flow diagrams\n\nSave to: docs/data-models/data-architecture.md\nDiagrams to: docs/diagrams/er-*.mmd",
+      "outputFile": "docs/data-models/data-architecture.md",
+      "additionalOutputs": ["docs/diagrams/er-complete.mmd", "docs/diagrams/data-flow.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "08-domain-analysis",
+      "name": "Domain Analysis and Boundary Identification",
+      "description": "Identify bounded contexts for strangler fig pattern",
+      "prompt": "Analyze the codebase to identify domain boundaries and create a strangler fig extraction plan:\n\n1. Domain Discovery:\n   - Identify distinct business domains/bounded contexts\n   - Look for natural boundaries in:\n     * Package/namespace organization\n     * Database schema (tables that cluster together)\n     * API endpoints that serve related functions\n     * Business logic that operates on related entities\n     * Teams or documentation that suggest ownership\n\n2. For Each Identified Domain:\n   - Domain name and business purpose\n   - Core entities/aggregates\n   - Business operations/use cases\n   - Data tables/collections used\n   - API endpoints serving this domain\n   - Dependencies on other domains\n   - External system integrations\n\n3. Domain Coupling Analysis:\n   - Identify tight coupling between domains\n   - Database-level coupling (foreign keys, joins)\n   - Code-level coupling (direct calls)\n   - Shared data structures\n   - Transaction boundaries that span domains\n\n4. Extraction Difficulty Assessment:\n   For each domain, rate extraction difficulty (Easy/Medium/Hard) based on:\n   - Coupling level with other domains\n   - Database entanglement\n   - Shared transaction requirements\n   - UI complexity\n   - External system dependencies\n\n5. Strangler Fig Sequencing:\n   Recommend extraction order based on:\n   - Business value of modernizing each domain\n   - Technical isolation (least coupled first)\n   - Risk level (lowest risk first)\n   - Team readiness\n   - Quick wins vs strategic domains\n\n6. For Each Domain - Extraction Strategy:\n   - Extraction pattern (API Gateway, Event Interception, Database View, etc.)\n   - Data synchronization approach\n   - API facade design\n   - Gradual migration steps\n   - Rollback strategy\n\n7. Anti-Corruption Layer Design:\n   - Interface definitions between legacy and new\n   - Data transformation requirements\n   - Event translation needs\n   - Temporary dual-write strategies\n\n8. Create Visualizations:\n   - Domain boundary diagram\n   - Domain dependency graph\n   - Extraction sequence timeline\n   - Target microservices architecture\n\nExample domains to look for:\n- User Management (authentication, profiles, preferences)\n- Product Catalog (items, categories, inventory)\n- Order Management (cart, checkout, order processing)\n- Payment Processing (transactions, billing, invoicing)\n- Reporting/Analytics (dashboards, metrics, reports)\n- Notification System (emails, alerts, messaging)\n- Search (product search, filters, recommendations)\n\nSave analysis to: docs/modernization/domain-extraction-plan.md\nSave diagrams to: docs/diagrams/domain-*.mmd",
+      "outputFile": "docs/modernization/domain-extraction-plan.md",
+      "additionalOutputs": ["docs/diagrams/domain-boundaries.mmd", "docs/diagrams/domain-dependencies.mmd", "docs/diagrams/extraction-sequence.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "09-business-processes",
+      "name": "Business Process and Logic Documentation",
+      "description": "Extract and document all business processes",
+      "prompt": "Document business processes and logic:\n\n1. Core Business Processes:\n   - User journeys\n   - System workflows\n   - Business transactions\n   - Batch processes\n   - Scheduled operations\n\n2. For Each Process:\n   - Process name and purpose\n   - Trigger conditions\n   - Step-by-step flow\n   - Decision points\n   - Data transformations\n   - External interactions\n   - Error scenarios\n   - Rollback procedures\n   - SLAs/timeouts\n\n3. Business Rules:\n   - Validation rules\n   - Calculation logic\n   - Pricing/rating logic\n   - Eligibility rules\n   - Approval workflows\n   - Business constraints\n\n4. State Management:\n   - Entity lifecycles\n   - State transitions\n   - Status management\n   - Workflow states\n\n5. Domain Logic:\n   - Core domain concepts\n   - Domain services\n   - Domain events\n   - Aggregate boundaries\n\n6. Integration Flows:\n   - System integrations\n   - Data synchronization\n   - Event propagation\n\n7. Create process flow diagrams\n8. Create state diagrams\n\nSave to: docs/business-logic/business-processes.md\nDiagrams to: docs/diagrams/process-*.mmd",
+      "outputFile": "docs/business-logic/business-processes.md",
+      "additionalOutputs": ["docs/diagrams/process-flows.mmd", "docs/diagrams/state-machines.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "09-security-compliance",
+      "name": "Security and Compliance Analysis",
+      "description": "Comprehensive security assessment",
+      "prompt": "Analyze security and compliance:\n\n1. Authentication Systems:\n   - Authentication methods\n   - Identity providers\n   - Session management\n   - Token handling\n   - Password policies\n   - MFA implementation\n\n2. Authorization:\n   - Permission models\n   - Role definitions\n   - Resource access control\n   - API security\n   - Data access controls\n\n3. Security Measures:\n   - Input validation\n   - Output encoding\n   - SQL injection prevention\n   - XSS prevention\n   - CSRF protection\n   - Security headers\n\n4. Cryptography:\n   - Encryption at rest\n   - Encryption in transit\n   - Key management\n   - Hashing algorithms\n   - Digital signatures\n\n5. Compliance:\n   - PII handling\n   - GDPR compliance\n   - Audit logging\n   - Data retention\n   - Right to erasure\n\n6. Vulnerabilities:\n   - Known CVEs in dependencies\n   - OWASP top 10 coverage\n   - Security anti-patterns\n   - Hardcoded secrets\n   - Insecure configurations\n\n7. Security Architecture:\n   - Network segmentation\n   - Defense in depth\n   - Zero trust elements\n\n8. Create security architecture diagram\n\nSave to: docs/analysis/security-compliance.md\nDiagram to: docs/diagrams/security-architecture.mmd",
+      "outputFile": "docs/analysis/security-compliance.md",
+      "additionalOutputs": ["docs/diagrams/security-architecture.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "10-performance-operations",
+      "name": "Performance and Operations Analysis",
+      "description": "Analyze performance characteristics and operational aspects",
+      "prompt": "Analyze performance and operations:\n\n1. Performance Characteristics:\n   - Response time requirements\n   - Throughput capabilities\n   - Concurrent user handling\n   - Resource utilization\n   - Bottleneck identification\n\n2. Optimization Strategies:\n   - Caching layers\n   - Database optimization\n   - Query performance\n   - Connection pooling\n   - Async processing\n   - Batch processing\n\n3. Scalability:\n   - Horizontal scaling capability\n   - Vertical scaling limits\n   - Stateless components\n   - Session management\n   - Load balancing ready\n\n4. Monitoring:\n   - Logging implementation\n   - Metrics collection\n   - Health checks\n   - Performance counters\n   - Distributed tracing\n\n5. Operations:\n   - Deployment process\n   - Configuration management\n   - Feature toggles\n   - Rollback procedures\n   - Disaster recovery\n\n6. Infrastructure:\n   - Server requirements\n   - Database requirements\n   - Network requirements\n   - Storage requirements\n   - Third-party services\n\n7. DevOps Readiness:\n   - CI/CD pipelines\n   - Containerization\n   - Infrastructure as code\n   - Automated testing\n\n8. Create performance profile\n\nSave to: docs/analysis/performance-operations.md",
+      "outputFile": "docs/analysis/performance-operations.md",
+      "status": "pending"
+    },
+    {
+      "id": "11-testing-quality",
+      "name": "Testing and Quality Analysis",
+      "description": "Analyze testing strategies and code quality",
+      "prompt": "Analyze testing and quality:\n\n1. Testing Infrastructure:\n   - Testing frameworks used\n   - Test runners\n   - Assertion libraries\n   - Mocking frameworks\n   - Test data management\n\n2. Test Coverage:\n   - Unit test coverage\n   - Integration test presence\n   - End-to-end tests\n   - Performance tests\n   - Security tests\n   - Coverage metrics\n\n3. Testing Patterns:\n   - Test organization\n   - Naming conventions\n   - Test data patterns\n   - Fixture management\n   - Test isolation\n\n4. Code Quality:\n   - Static analysis tools\n   - Linting rules\n   - Code formatting\n   - Complexity metrics\n   - Technical debt\n\n5. Quality Gates:\n   - Build-time checks\n   - Pre-commit hooks\n   - PR requirements\n   - Quality thresholds\n\n6. Documentation:\n   - Code documentation\n   - API documentation\n   - README files\n   - Architecture decisions\n   - Runbooks\n\n7. Continuous Improvement:\n   - Code review process\n   - Refactoring needs\n   - Deprecation handling\n   - Update strategies\n\nSave to: docs/analysis/testing-quality.md",
+      "outputFile": "docs/analysis/testing-quality.md",
+      "status": "pending"
+    },
+    {
+      "id": "12-modernization-assessment",
+      "name": "Comprehensive Modernization Assessment",
+      "description": "Detailed modernization analysis and recommendations",
+      "prompt": "Create comprehensive modernization assessment:\n\n1. Technology Currency:\n   - Component age analysis\n   - EOL/deprecated technologies\n   - Security vulnerabilities\n   - Performance limitations\n   - Maintenance burden\n\n2. Modernization Drivers:\n   - Business drivers\n   - Technical drivers\n   - Risk drivers\n   - Cost drivers\n   - Compliance drivers\n\n3. Target State Options:\n   - Cloud-native transformation\n   - Microservices migration\n   - Container adoption\n   - Serverless opportunities\n   - Platform modernization\n\n4. Technology Recommendations:\n   For Java EE:\n   - Spring Boot adoption\n   - Spring Cloud for microservices\n   - Angular/React for frontend\n   - Kubernetes deployment\n   \n   For .NET Framework:\n   - .NET 6+ migration\n   - Blazor/Angular frontend\n   - Azure cloud services\n   - Container support\n   \n   For Legacy Web:\n   - SPA frameworks\n   - API-first architecture\n   - Modern build tools\n   - Progressive enhancement\n\n5. Migration Strategies:\n   - Rehost (lift and shift)\n   - Replatform\n   - Refactor\n   - Rearchitect\n   - Rebuild\n   - Replace\n\n6. Risk Assessment:\n   - Technical risks\n   - Business risks\n   - Resource risks\n   - Timeline risks\n   - Integration risks\n\n7. ROI Analysis:\n   - Cost savings\n   - Performance gains\n   - Maintenance reduction\n   - Agility improvements\n\n8. Prioritization Matrix\n\nSave to: docs/modernization/modernization-assessment.md",
+      "outputFile": "docs/modernization/modernization-assessment.md",
+      "status": "pending"
+    },
+    {
+      "id": "13-migration-roadmap",
+      "name": "Detailed Migration Roadmap and Planning",
+      "description": "Create actionable migration roadmap",
+      "prompt": "Create detailed migration roadmap:\n\n1. Migration Phases:\n\nPhase 0: Foundation (Months 1-2)\n- Tool selection and setup\n- Team training\n- Pilot selection\n- Environment setup\n- CI/CD pipeline\n\nPhase 1: Core Platform (Months 3-6)\n- Framework migration\n- Build system modernization\n- Basic containerization\n- Development environment\n- Initial testing\n\nPhase 2: Data Layer (Months 5-8)\n- Database migration\n- ORM modernization\n- Cache implementation\n- Data access patterns\n- Performance optimization\n\nPhase 3: Business Logic (Months 7-12)\n- Service extraction\n- API development\n- Business rule migration\n- Integration updates\n- Testing expansion\n\nPhase 4: User Interface (Months 10-15)\n- Frontend framework\n- Component library\n- State management\n- API integration\n- UX improvements\n\nPhase 5: Infrastructure (Months 14-18)\n- Cloud migration\n- Container orchestration\n- Monitoring setup\n- Security hardening\n- Performance tuning\n\n2. For Each Phase:\n- Objectives and goals\n- Specific tasks\n- Dependencies\n- Resources needed\n- Success criteria\n- Rollback plan\n- Risk mitigation\n\n3. Parallel Workstreams:\n- Technical tasks\n- Testing activities\n- Documentation\n- Training\n- Communication\n\n4. Milestones:\n- Phase completions\n- Go/no-go decisions\n- Production releases\n- Decommission points\n\n5. Resource Plan:\n- Team composition\n- Skill requirements\n- Training needs\n- External support\n\n6. Create Gantt chart\n7. Create migration architecture evolution\n\nSave to: docs/modernization/migration-roadmap.md\nDiagrams to: docs/diagrams/migration-*.mmd",
+      "outputFile": "docs/modernization/migration-roadmap.md",
+      "additionalOutputs": ["docs/diagrams/migration-gantt.mmd", "docs/diagrams/migration-architecture.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "14-component-mapping",
+      "name": "Detailed Legacy to Modern Component Mapping",
+      "description": "Map every legacy component to modern equivalent",
+      "prompt": "Create exhaustive component mapping:\n\n1. Technology Stack Mapping:\n   Create detailed mapping tables for detected technology:\n   \n   For Java EE → Spring Boot:\n   - EJB → Spring Service\n   - Servlet → Spring Controller\n   - JSP → Thymeleaf/Angular\n   - JNDI → Spring Configuration\n   - JMS → Spring JMS/RabbitMQ\n   - JAX-RS → Spring REST\n   - JPA → Spring Data JPA\n   \n   For .NET Framework → .NET 6+:\n   - Web Forms → Blazor/MVC\n   - WCF → gRPC/Web API\n   - ASMX → Web API\n   - ADO.NET → EF Core\n   - Enterprise Library → Built-in\n   \n   [Continue for detected stack]\n\n2. Code Pattern Transformations:\n   - Legacy Pattern → Modern Pattern\n   - Migration complexity\n   - Code examples\n   - Tool support available\n\n3. Configuration Migration:\n   - XML → Code/YAML\n   - Web.xml → Java Config\n   - app.config → appsettings.json\n   - Property files → Config server\n\n4. Build System Migration:\n   - Ant → Maven/Gradle\n   - MSBuild → .NET CLI\n   - Custom scripts → Standard tasks\n\n5. Testing Migration:\n   - JUnit 4 → JUnit 5\n   - MSTest → xUnit\n   - Mock frameworks\n   - Integration test updates\n\n6. Infrastructure Components:\n   - App servers → Embedded servers\n   - Service bus → Message brokers\n   - Caching solutions\n   - Session management\n\n7. Create transformation guides\n\nSave to: docs/modernization/component-mapping.md\nGuides to: docs/modernization/guides/",
+      "outputFile": "docs/modernization/component-mapping.md",
+      "additionalOutputs": ["docs/modernization/guides/"],
+      "status": "pending"
+    },
+    {
+      "id": "15-implementation-guides",
+      "name": "Implementation Guides and Code Examples",
+      "description": "Create practical implementation guides",
+      "prompt": "Create implementation guides with examples:\n\n1. Quick Start Guides:\n   - Environment setup\n   - First migration\n   - Common patterns\n   - Troubleshooting\n\n2. Migration Patterns:\n   For each common pattern, provide:\n   - Problem description\n   - Legacy approach\n   - Modern approach\n   - Step-by-step migration\n   - Code examples (before/after)\n   - Testing approach\n   - Common pitfalls\n\n3. Component Migration Guides:\n   - Controller migration\n   - Service migration\n   - Data access migration\n   - Configuration migration\n   - Security migration\n\n4. Code Transformation Examples:\n   - Real examples from codebase\n   - Transformation steps\n   - Validation approach\n   - Performance comparison\n\n5. Tool Usage:\n   - Migration tools\n   - Automation scripts\n   - Validation tools\n   - Testing tools\n\n6. Best Practices:\n   - Do's and don'ts\n   - Performance tips\n   - Security considerations\n   - Testing strategies\n\n7. Create runnable examples\n\nSave to: docs/modernization/implementation-guides.md\nExamples to: docs/modernization/examples/",
+      "outputFile": "docs/modernization/implementation-guides.md",
+      "additionalOutputs": ["docs/modernization/examples/"],
+      "status": "pending"
+    },
+    {
+      "id": "16-validation",
+      "name": "Validate All Documentation and Diagrams",
+      "description": "Comprehensive validation of generated content",
+      "prompt": "Validate all generated documentation:\n\n1. Documentation Completeness:\n   - Check all expected files exist\n   - Verify no placeholder content\n   - Ensure consistent formatting\n   - Check internal links\n\n2. Diagram Validation:\n   - Run syntax validation\n   - Check diagram completeness\n   - Verify relationships\n   - Ensure readability\n\n3. Technical Accuracy:\n   - Verify component counts\n   - Check dependency accuracy\n   - Validate API documentation\n   - Confirm security findings\n\n4. Consistency Checks:\n   - Terminology consistency\n   - Version consistency\n   - Format consistency\n   - Style consistency\n\n5. Coverage Validation:\n   - All components documented\n   - All APIs covered\n   - All processes mapped\n   - All risks identified\n\n6. Run validation scripts\n\nGenerate validation report.\n\nSave to: docs/validation-report.md",
+      "outputFile": "docs/validation-report.md",
+      "command": "bash scripts/validate-mermaid.sh",
+      "status": "pending"
+    },
+    {
+      "id": "17-update-claude-md",
+      "name": "Update CLAUDE.md with Rich Content",
+      "description": "Create comprehensive CLAUDE.md",
+      "prompt": "Update CLAUDE.md with all discovered information:\n\n1. Use the template in CLAUDE.md.template as base\n2. Fill in all sections with actual discovered content\n3. Include specific examples from the codebase\n4. Add discovered patterns and conventions\n5. Include migration recommendations\n6. Add team-specific guidance\n7. Make it a comprehensive reference\n\nEnsure CLAUDE.md becomes the single source of truth for understanding this codebase.\n\nUpdate: CLAUDE.md",
+      "outputFile": "CLAUDE.md",
+      "status": "pending"
+    },
+    {
+      "id": "18-executive-summary",
+      "name": "Generate Executive Summary and Dashboards",
+      "description": "Create high-level summary with visual dashboards",
+      "prompt": "Create executive summary with dashboards:\n\n1. Executive Summary (2-3 pages):\n   - System overview\n   - Current state assessment\n   - Key findings\n   - Risk assessment\n   - Modernization recommendation\n   - Investment required\n   - Expected benefits\n   - Recommended approach\n   - Timeline overview\n   - Next steps\n\n2. Visual Dashboards:\n   - Technology stack overview\n   - Component distribution\n   - Complexity metrics\n   - Technical debt indicators\n   - Security scorecard\n   - Migration effort matrix\n\n3. Key Metrics:\n   - Codebase size\n   - Component count\n   - Dependency count\n   - Technical debt score\n   - Security score\n   - Modernization effort\n\n4. Decision Matrix:\n   - Migration options\n   - Pros and cons\n   - Risk vs reward\n   - Recommended path\n\n5. Stakeholder Views:\n   - Technical view\n   - Business view\n   - Risk view\n   - Timeline view\n\n6. Create dashboard diagrams\n\nSave to: docs/executive-summary.md\nDashboards to: docs/diagrams/dashboards/",
+      "outputFile": "docs/executive-summary.md",
+      "additionalOutputs": ["docs/diagrams/dashboard-overview.mmd"],
+      "status": "pending"
+    },
+    {
+      "id": "19-knowledge-base",
+      "name": "Generate Searchable Knowledge Base",
+      "description": "Create indexed knowledge base for easy reference",
+      "prompt": "Create searchable knowledge base:\n\n1. Component Index:\n   - Alphabetical listing\n   - By type listing\n   - By module listing\n   - Cross-references\n\n2. API Index:\n   - Endpoint catalog\n   - Parameter reference\n   - Response reference\n   - Error codes\n\n3. Pattern Catalog:\n   - Design patterns used\n   - Code examples\n   - When to use\n   - Implementation notes\n\n4. Troubleshooting Guide:\n   - Common issues\n   - Error messages\n   - Solutions\n   - Workarounds\n\n5. FAQ:\n   - Architecture questions\n   - Development questions\n   - Deployment questions\n   - Migration questions\n\n6. Glossary:\n   - Technical terms\n   - Business terms\n   - Acronyms\n   - Domain concepts\n\n7. Create searchable index\n\nSave to: docs/knowledge-base/\nIndex to: docs/knowledge-base/index.md",
+      "outputFile": "docs/knowledge-base/index.md",
+      "additionalOutputs": ["docs/knowledge-base/"],
+      "status": "pending"
+    },
+    {
+      "id": "20-final-package",
+      "name": "Package Documentation and Generate Archive",
+      "description": "Create final documentation package",
+      "prompt": "Create final documentation package:\n\n1. Documentation Package:\n   - Create table of contents\n   - Generate PDF versions\n   - Create navigation\n   - Add timestamps\n   - Version information\n\n2. Deliverables Checklist:\n   - All documentation complete\n   - All diagrams validated\n   - All examples tested\n   - All links working\n   - All formats generated\n\n3. Archive Creation:\n   - Documentation bundle\n   - Diagram collection\n   - Example code\n   - Migration scripts\n   - Tool configurations\n\n4. Usage Instructions:\n   - How to navigate\n   - How to search\n   - How to update\n   - How to extend\n\n5. Future Maintenance:\n   - Update procedures\n   - Validation process\n   - Version control\n   - Change tracking\n\nGenerate final package.\n\nSave manifest to: docs/manifest.md",
+      "outputFile": "docs/manifest.md",
+      "status": "pending"
+    }
+  ]
+}
