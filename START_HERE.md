@@ -18,22 +18,20 @@ ls app/  # Should show your codebase files
 If taskmaster hasn't been initialized:
 ```bash
 Initialize taskmaster project for claude code
-# Task master will create a folder structure but ignore when asked to create a PRD
-# It will probably do the rest for you but otherwise you need to copy the tasks then
-# generate
-# Copy the tasks.json to .taskmaster/tasks:
-cp tasks.json .taskmaster/tasks/
+# Task master will create a folder structure and then ask to proceed with initialise_project
+# It will then advise on creating a PRD but instead you can ask it to: 
+Copy my existing task.json file to .taskmaster/tasks/
+# Then generate the task files:
+Generate individual task files
 ```
 
-### 4. Use Task Automation
+### 4. Use Tasks
 Tell Claude one of these - the **first option** is the suggested approach:
-- "Initialize taskmaster and run the documentation tasks" 
-- "Please run the documentation tasks using taskmaster"
+- "Run the documentation tasks using taskmaster"
 - "Use task automation to generate documentation"
 
 Or manually start with:
-- "Run task 01-init to set up the documentation structure"
-- "Run task 02-codebase-analysis to identify the technology stack"
+- "Run task 01-codebase-analysis"
 - Continue through all tasks...
 
 ### 4. Key Files
