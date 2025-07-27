@@ -17,10 +17,12 @@ ls app/  # Should show your codebase files
 ### 3. Initialize Task Automation (if needed)
 If taskmaster hasn't been initialized:
 ```bash
-# Claude will automatically initialize taskmaster when you mention tasks
-# Or you can manually ensure it's set up:
-mkdir -p .taskmaster
-cp tasks.json .taskmaster/
+Initialize taskmaster project for claude code
+# Task master will create a folder structure but ignore when asked to create a PRD
+# It will probably do the rest for you but otherwise you need to copy the tasks then
+# generate
+# Copy the tasks.json to .taskmaster/tasks:
+cp tasks.json .taskmaster/tasks/
 ```
 
 ### 4. Use Task Automation

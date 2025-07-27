@@ -89,3 +89,10 @@ node_modules/
 # Docker
 docker-compose.override.yml
 .docker/
+
+# Environment variables
+# OS specific
+
+# Task files
+# tasks.json
+# tasks/ 
