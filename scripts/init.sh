@@ -65,37 +65,39 @@ This documentation was generated using automated codebase analysis.
 To regenerate, run the task automation system.
 EOF
 
-# Create CLAUDE.md template if it doesn't exist
+# Create CLAUDE.md from template if it doesn't exist
 if [ ! -f "${PROJECT_ROOT}/CLAUDE.md" ]; then
-    echo -e "${YELLOW}Creating CLAUDE.md template...${NC}"
-    cat > "${PROJECT_ROOT}/CLAUDE.md" << 'EOF'
+    echo -e "${YELLOW}Creating CLAUDE.md from template...${NC}"
+    
+    # Check which template to use
+    if [ -f "${PROJECT_ROOT}/config/CLAUDE-INSTRUCTIONS.md.template" ]; then
+        # Use the instructions template for initial setup
+        cp "${PROJECT_ROOT}/config/CLAUDE-INSTRUCTIONS.md.template" "${PROJECT_ROOT}/CLAUDE.md"
+        echo -e "${GREEN}✓ CLAUDE.md created from CLAUDE-INSTRUCTIONS.md.template${NC}"
+    elif [ -f "${PROJECT_ROOT}/config/CLAUDE.md.template" ]; then
+        # Fallback to regular template
+        cp "${PROJECT_ROOT}/config/CLAUDE.md.template" "${PROJECT_ROOT}/CLAUDE.md"
+        echo -e "${GREEN}✓ CLAUDE.md created from CLAUDE.md.template${NC}"
+    else
+        # Create basic template if no template files exist
+        echo -e "${YELLOW}No template found, creating basic CLAUDE.md...${NC}"
+        cat > "${PROJECT_ROOT}/CLAUDE.md" << 'EOF'
 # CLAUDE.md
 
 This file provides guidance to Claude Code when working with code in this repository.
 
 ## Project Overview
 
-[This section will be filled in after codebase analysis]
-
-## Architecture
-
-[This section will be filled in after codebase analysis]
-
-## Common Development Commands
-
-[This section will be filled in after codebase analysis]
-
-## Key Patterns and Conventions
-
-[This section will be filled in after codebase analysis]
+- The application code is located in the `app/` directory
+- Documentation is generated in the `docs/` directory
+- Use tasks.json for systematic analysis
 
 ## Important Notes
 
-- The codebase is located in the `app/` directory
-- Documentation is generated in the `docs/` directory
-- Use tasks.json for systematic analysis
+Please analyze the codebase and create comprehensive documentation.
 EOF
-    echo -e "${GREEN}✓ CLAUDE.md template created${NC}"
+    fi
+    echo -e "${GREEN}✓ CLAUDE.md created${NC}"
 else
     echo -e "${GREEN}✓ CLAUDE.md already exists${NC}"
 fi

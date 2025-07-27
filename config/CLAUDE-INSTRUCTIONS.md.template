@@ -1,0 +1,105 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code when working with code in this repository.
+
+## Primary Mission
+
+Your primary objective is to analyse the application codebase in the `app/` directory and create comprehensive documentation that enables developers to understand, maintain, and modernise the system.
+
+## Documentation Goals
+
+1. **Complete Codebase Understanding**: Analyse every file, function, and module to create a complete picture of the system
+2. **Visual Documentation**: Create Mermaid diagrams for all architectural components, data flows, and relationships
+3. **Business Logic Extraction**: Document all business rules, workflows, and domain logic
+4. **Modernisation Roadmap**: Identify technical debt and provide specific recommendations for modernisation
+
+## Project Structure
+
+- **Application Code**: `/app/` - The complete application codebase to be analysed
+- **Documentation Output**: `/docs/` - All generated documentation goes here
+  - `/docs/analysis/` - Initial codebase inventory and analysis
+  - `/docs/architecture/` - System architecture documentation
+  - `/docs/business-logic/` - Business flows and rules
+  - `/docs/data-models/` - Data structures and relationships
+  - `/docs/api/` - API endpoints and interfaces
+  - `/docs/diagrams/` - Mermaid diagram files (.mmd)
+  - `/docs/modernisation/` - Migration recommendations
+
+## Documentation Standards
+
+### For Each Component/Module:
+1. **Purpose**: Clear explanation of what it does
+2. **Dependencies**: What it depends on and what depends on it
+3. **Data Flow**: How data moves through the component
+4. **Business Rules**: Any business logic implemented
+5. **Technical Debt**: Issues, anti-patterns, or modernisation needs
+
+### Diagram Requirements:
+- Create Mermaid diagrams for:
+  - System architecture overview
+  - Data flow diagrams for each major process
+  - Entity relationship diagrams
+  - Sequence diagrams for key workflows
+  - Component dependency graphs
+- Save all diagrams as .mmd files in `/docs/diagrams/`
+- Include rendered previews in the markdown documentation
+
+### Analysis Approach:
+1. Start with high-level architecture understanding
+2. Map all data models and relationships
+3. Trace business workflows end-to-end
+4. Document APIs and integration points
+5. Identify patterns and anti-patterns
+6. Create visual representations for everything
+
+## Key Analysis Areas
+
+1. **Technology Stack**: Identify all frameworks, libraries, and tools used
+2. **Architecture Pattern**: Determine if it's MVC, microservices, monolithic, etc.
+3. **Data Layer**: Database schema, ORM usage, data access patterns
+4. **Business Logic Layer**: Core domain logic, business rules, validations
+5. **Presentation Layer**: UI components, templates, client-side logic
+6. **Integration Points**: External services, APIs, message queues
+7. **Security**: Authentication, authorisation, data protection
+8. **Performance**: Bottlenecks, optimisation opportunities
+9. **Testing**: Test coverage, testing strategies
+10. **Deployment**: Build processes, configuration management
+
+## Output Format
+
+### Documentation Files:
+- Use clear, hierarchical markdown structure
+- Include code examples with syntax highlighting
+- Cross-reference related documentation
+- Maintain a consistent format across all files
+
+### File Naming:
+- Use lowercase with hyphens (e.g., `user-authentication-flow.md`)
+- Prefix with numbers for ordering (e.g., `01-overview.md`)
+- Match diagram names to their documentation files
+
+## Important Notes
+
+- Focus on understanding the "why" not just the "what"
+- Document both the current state and ideal future state
+- Identify quick wins vs long-term modernisation efforts
+- Consider the business impact of technical decisions
+- Make documentation accessible to both technical and non-technical stakeholders
+
+## Working Process
+
+1. Use the task management system (tasks.json) to track progress systematically
+2. Start with a complete file inventory and technology assessment
+3. Build documentation incrementally, layer by layer
+4. Create diagrams as you analyse each component
+5. Regularly synthesize findings into higher-level insights
+6. Ensure all documentation is interconnected and searchable
+
+## Specific Instructions for This Repository
+
+- The application code is located in the `app/` directory
+- All documentation should be generated in the `docs/` directory
+- Use tasks.json for systematic task tracking
+- Reference the CLAUDE.md.template in the config directory for the output format
+
+Remember: The goal is to create documentation so comprehensive that a new developer could understand the entire system and a business analyst could understand all the business logic implemented in code.

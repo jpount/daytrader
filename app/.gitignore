@@ -6,3 +6,5 @@
 /.settings/
 .factorypath
 /.gradle
+# Prevent taskmaster directory in app folder
+.taskmaster/

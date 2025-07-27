@@ -88,10 +88,10 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ## Key Patterns and Conventions
 
-### Code Organization
+### Code Organisation
 - **Package/Namespace Structure:** [How code is organized]
 - **File Naming:** [Naming conventions used]
-- **Component Organization:** [How components are structured]
+- **Component Organisation:** [How components are structured]
 
 ### Coding Standards
 - **Language Version:** [Version used]
@@ -110,7 +110,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 ### Security Patterns
 - **Authentication:** [Method used]
-- **Authorization:** [How permissions are handled]
+- **Authorisation:** [How permissions are handled]
 - **Data Validation:** [Validation approach]
 
 ## Important Notes
@@ -156,7 +156,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 - **Testing Strategies:** [Best practices for this codebase]
 - **Documentation:** [Where to find more docs]
 
-## Modernization Context
+## Modernisation Context
 
 ### Current State Assessment
 - **Technology Currency:** [How up-to-date]

@@ -15,8 +15,13 @@ ls app/  # Should show your codebase files
 ```
 
 ### 3. Initialize Task Automation (if needed)
+**IMPORTANT: Always run taskmaster commands from the project root directory (/Users/jp/work/ai-messin/daytrader), NOT from the app/ directory**
+
 If taskmaster hasn't been initialized:
 ```bash
+# Make sure you're in the project root, not in app/
+cd /Users/jp/work/ai-messin/daytrader
+
 Initialize taskmaster project for claude code
 # Task master will create a folder structure and then ask to proceed with initialise_project
 # It will then advise on creating a PRD but instead you can ask it to: 

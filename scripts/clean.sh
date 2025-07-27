@@ -51,6 +51,12 @@ find "${DOCS_DIR}" -type f -name "*.json" -delete 2>/dev/null || true
 find "${DOCS_DIR}" -type f -name "*.yaml" -delete 2>/dev/null || true
 find "${DOCS_DIR}" -type f -name "*.txt" -delete 2>/dev/null || true
 
+# Remove system files like .DS_Store
+find "${DOCS_DIR}" -name ".DS_Store" -delete 2>/dev/null || true
+
+# Remove all subdirectories from docs (they will be recreated by init)
+find "${DOCS_DIR}" -mindepth 1 -type d -exec rm -rf {} + 2>/dev/null || true
+
 # Remove any database files if they exist
 rm -rf "${PROJECT_ROOT}/.doc-db" 2>/dev/null || true
 rm -f "${PROJECT_ROOT}/.env.documentation" 2>/dev/null || true
